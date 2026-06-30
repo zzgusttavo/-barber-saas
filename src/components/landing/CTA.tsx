@@ -24,12 +24,12 @@ export default function CTA() {
             Experimente o Agenda Barber e descubra como é simples gerenciar sua barbearia com uma plataforma moderna, rápida e intuitiva.
           </p>
           
-          <Link 
-            href="/barbeiro" 
+          <a 
+            href="https://mpago.la/29xoehn" 
             className="inline-block px-10 py-5 rounded-full bg-black text-white font-black text-xl hover:bg-gray-900 transition-all hover:scale-105 shadow-2xl"
           >
             Quero Testar Grátis por 7 Dias
-          </Link>
+          </a>
         </motion.div>
       </div>
     </section>

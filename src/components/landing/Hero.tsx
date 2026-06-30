@@ -39,12 +39,12 @@ export default function Hero() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center gap-4 mb-10">
-            <Link 
-              href="#planos" 
-              className="w-full sm:w-auto px-8 py-4 rounded-full bg-primary text-black font-bold text-lg hover:bg-primary-hover transition-all hover:scale-105 shadow-[0_0_20px_rgba(34,197,94,0.4)]"
+            <a 
+              href="https://mpago.la/29xoehn" 
+              className="w-full sm:w-auto px-8 py-4 rounded-full bg-primary text-black font-bold text-lg hover:bg-primary-hover transition-all hover:scale-105 shadow-[0_0_20px_rgba(34,197,94,0.4)] text-center"
             >
               Teste Grátis por 7 Dias
-            </Link>
+            </a>
           </div>
 
           <div className="flex items-center gap-4">
