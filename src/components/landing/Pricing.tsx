@@ -72,7 +72,7 @@ export default function Pricing() {
                 href="/barbeiro" 
                 className="block w-full py-4 rounded-xl bg-primary text-black font-bold text-lg hover:bg-primary-hover transition-colors shadow-[0_0_20px_rgba(34,197,94,0.3)] relative z-10"
               >
-                Começar Agora
+                Teste Grátis por 7 Dias
               </Link>
               <p className="text-xs text-text-secondary mt-4 relative z-10">
                 Sem fidelidade • Cancele quando quiser
