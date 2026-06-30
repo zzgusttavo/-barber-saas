@@ -25,9 +25,13 @@ export default function AppDonoPage() {
   const [slug, setSlug] = useState("salaomodelo");
   const [ownerName, setOwnerName] = useState("Carlos Eduardo");
   const [ownerPhone, setOwnerPhone] = useState("(11) 99999-9999");
+  const [domainHost, setDomainHost] = useState("agendabarber.com");
+  const [domainOrigin, setDomainOrigin] = useState("https://agendabarber.com");
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      setDomainHost(window.location.host);
+      setDomainOrigin(window.location.origin);
       const bn = localStorage.getItem('barber_businessName');
       const sl = localStorage.getItem('barber_slug');
       const on = localStorage.getItem('barber_fullName');
@@ -197,8 +201,9 @@ export default function AppDonoPage() {
   };
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText("barbeiro.com/salaomodelo");
-    alert("Link copiado para a área de transferência!");
+    const link = `${domainOrigin}/agendar/${slug}`;
+    navigator.clipboard.writeText(link);
+    alert(`Link copiado: ${link}`);
   };
 
   return (
@@ -468,7 +473,8 @@ export default function AppDonoPage() {
               className={styles.primaryButton}
               style={{ backgroundColor: '#25D366', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: 'none', marginBottom: 0 }}
               onClick={() => {
-                const msg = encodeURIComponent(`Olá! Agora nossa barbearia tem aplicativo próprio. Agende seu horário sem filas pelo nosso link oficial:\n\n👉 https://agendabarber.com/agendar/${slug}`);
+                const link = `${domainOrigin}/agendar/${slug}`;
+                const msg = encodeURIComponent(`Olá! Agora nossa barbearia tem aplicativo próprio. Agende seu horário sem filas pelo nosso link oficial:\n\n👉 ${link}`);
                 window.open(`https://wa.me/?text=${msg}`, '_blank');
               }}
             >
@@ -556,7 +562,7 @@ export default function AppDonoPage() {
             </div>
             <div>
               <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>Link Público da Barbearia</div>
-              <div style={{ fontSize: '0.875rem', color: 'var(--theme-text-muted)' }}>agendabarber.com/agendar/{slug}</div>
+              <div style={{ fontSize: '0.875rem', color: 'var(--theme-text-muted)' }}>{domainHost}/agendar/{slug}</div>
             </div>
             <button 
               className={`${styles.actionButton} ${styles.btnPrimary}`} 
