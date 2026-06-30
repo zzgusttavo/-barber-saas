@@ -48,13 +48,13 @@ export default function Pricing() {
               <p className="text-text-secondary mb-6 relative z-10">Tudo incluso. Sem taxas escondidas.</p>
               
               <div className="mb-8 relative z-10">
-                <p className="text-sm text-text-secondary font-medium uppercase tracking-wider mb-2">Primeiro mês</p>
-                <div className="flex items-center justify-center gap-1">
-                  <span className="text-xl font-bold text-white">R$</span>
-                  <span className="text-6xl font-black text-white">5</span>
-                  <span className="text-xl font-bold text-white">,00</span>
+                <p className="text-primary text-sm font-bold tracking-widest uppercase mb-4">7 Dias Grátis</p>
+                <div className="flex justify-center items-start gap-1 mb-2">
+                  <span className="text-xl font-bold text-white mt-2">R$</span>
+                  <span className="text-7xl font-black text-white tracking-tighter">49</span>
+                  <span className="text-xl font-bold text-white mt-2">,90</span>
                 </div>
-                <p className="text-text-secondary mt-2">Depois R$ 44,90/mês</p>
+                <p className="text-text-secondary mb-8">por mês após o período de teste</p>
               </div>
 
               <div className="space-y-4 mb-10 text-left relative z-10">
