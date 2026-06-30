@@ -316,7 +316,7 @@ export default function AppDonoPage() {
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', paddingBottom: '2rem' }}>
             {services.map(service => (
-              <div key={service.id} style={{ display: 'flex', flexDirection: 'column', backgroundColor: 'var(--theme-card)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <div key={service.id} style={{ display: 'flex', flexDirection: 'column', backgroundColor: 'var(--theme-card)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.1)' }}>
                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                   <div style={{ flex: 2, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <label style={{ fontSize: '0.75rem', color: 'var(--theme-text-muted)' }}>Nome do Serviço</label>
@@ -400,7 +400,7 @@ export default function AppDonoPage() {
                         </button>
                       </div>
                     ) : (
-                      <div style={{ backgroundColor: '#111', padding: '1rem', borderRadius: '8px', border: '1px dashed #25D366', marginBottom: '1rem', textAlign: 'center' }}>
+                      <div style={{ backgroundColor: 'var(--theme-card)', padding: '1rem', borderRadius: '8px', border: '1px dashed #25D366', marginBottom: '1rem', textAlign: 'center' }}>
                         <span style={{ fontSize: '2rem', fontWeight: 900, letterSpacing: '4px', color: '#25D366' }}>{waCode}</span>
                         <p style={{ color: 'var(--theme-text-muted)', fontSize: '0.75rem', marginTop: '0.5rem' }}>Aguardando você digitar o código no WhatsApp...</p>
                       </div>
@@ -563,7 +563,7 @@ export default function AppDonoPage() {
               <span style={{ color: 'var(--theme-text-muted)' }}>Cortes Finalizados</span>
               <span style={{ fontWeight: 700 }}>{todaysAppointments.filter(a => a.status === 'completed').length} cortes</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(0,0,0,0.1)' }}>
               <span style={{ fontWeight: 700, color: 'var(--theme-accent)' }}>Total de Hoje</span>
               <span style={{ fontWeight: 800, fontSize: '1.25rem', color: 'var(--theme-accent)' }}>{formatCurrency(totalEarningsToday)}</span>
             </div>
@@ -575,7 +575,7 @@ export default function AppDonoPage() {
               <span style={{ color: 'var(--theme-text-muted)' }}>Cortes Finalizados</span>
               <span style={{ fontWeight: 700 }}>{appointments.filter(a => a.status === 'completed' && a.dateObj.getMonth() === currentMonthNum).length} cortes</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(0,0,0,0.1)' }}>
               <span style={{ fontWeight: 700, color: 'var(--theme-success)' }}>Faturamento Bruto</span>
               <span style={{ fontWeight: 800, fontSize: '1.25rem', color: 'var(--theme-success)' }}>{formatCurrency(totalEarningsMonth)}</span>
             </div>
@@ -623,7 +623,7 @@ export default function AppDonoPage() {
 
             <div style={{ overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem', paddingBottom: '1rem' }}>
               {team.map(member => (
-                <div key={member.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: 'var(--theme-card)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div key={member.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: 'var(--theme-card)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.1)' }}>
                   
                   {/* Foto Idêntica ao resto do app */}
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
