@@ -315,7 +315,7 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
 
       {/* Bloco 3: Data e Hora */}
       <div className={styles.contentBlock}>
-        <h2 className={styles.blockTitle}>Escolha o Horário</h2>
+        <h2 className={styles.blockTitle}>Escolha a Data e o Horário</h2>
         
         {/* Filtro de Datas Horizontal */}
         <div className={styles.dateFilter}>
