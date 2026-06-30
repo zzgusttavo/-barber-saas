@@ -2,7 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const qrcode = require('qrcode');
 const pino = require('pino');
-const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
+const { default: makeWASocket, DisconnectReason } = require('@whiskeysockets/baileys');
+const { usePostgresAuthState } = require('./usePostgresAuthState');
 const path = require('path');
 const fs = require('fs');
 
@@ -18,8 +19,7 @@ let currentPairingCode = null;
 let isConnected = false;
 
 async function connectToWhatsApp() {
-    const authFolder = path.join(__dirname, 'auth_info_baileys');
-    const { state, saveCreds } = await useMultiFileAuthState(authFolder);
+    const { state, saveCreds } = await usePostgresAuthState('default');
 
     sock = makeWASocket({
         auth: state,

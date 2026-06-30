@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -89,4 +89,18 @@ model Appointment {
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+// ----------------------------------------------------------------------------
+// Tabela Exclusiva para Nuvem Gratuita
+// Salva os dados de login do WhatsApp (Baileys) no Banco de Dados
+// para evitar que o QR Code seja exigido quando o Render dormir.
+// ----------------------------------------------------------------------------
+model WhatsAppSession {
+  pk        String   @id @default(uuid())
+  sessionId String   // Identificador da sessão (ex: "default")
+  key       String   // Chave do Baileys (ex: "creds")
+  value     String   // O JSON do token salvo em texto longo
+  
+  @@unique([sessionId, key])
 }

@@ -2,11 +2,28 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  const shop = await prisma.barbershop.findFirst();
-  if (!shop) throw new Error("No shop");
+  let shop = await prisma.barbershop.findFirst();
+  if (!shop) {
+    shop = await prisma.barbershop.create({
+      data: {
+        name: 'Salão Modelo',
+        phone: '11999999999',
+        address: 'Av Paulista, 1000'
+      }
+    });
+  }
 
-  const barber = await prisma.barber.findFirst();
-  if (!barber) throw new Error("No barber");
+  let barber = await prisma.barber.findFirst();
+  if (!barber) {
+    barber = await prisma.barber.create({
+      data: {
+        name: 'Carlos Eduardo',
+        username: 'carlos',
+        password: '123',
+        barbershopId: shop.id
+      }
+    });
+  }
 
   let service = await prisma.service.findFirst();
   if (!service) {
