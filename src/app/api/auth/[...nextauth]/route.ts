@@ -21,33 +21,41 @@ const handler = NextAuth({
           throw new Error("Email e senha são obrigatórios.");
         }
 
-        const barber = await prisma.barber.findUnique({
-          where: { email: credentials.email },
-          include: { barbershop: true }
-        });
+        try {
+          const barber = await prisma.barber.findUnique({
+            where: { email: credentials.email },
+            include: { barbershop: true }
+          });
 
-        if (!barber) {
-          throw new Error("Usuário não encontrado.");
+          if (!barber) {
+            throw new Error("Usuário ou senha incorretos.");
+          }
+
+          const isValid = await bcrypt.compare(credentials.password, barber.password);
+
+          if (!isValid) {
+            throw new Error("Usuário ou senha incorretos.");
+          }
+
+          if (!barber.active) {
+            throw new Error("Sua conta foi desativada.");
+          }
+
+          // Retornar objeto do usuário que ficará na sessão
+          return {
+            id: barber.id,
+            name: barber.name,
+            email: barber.email,
+            barbershopId: barber.barbershopId,
+            slug: barber.barbershop.slug,
+          };
+        } catch (error: any) {
+          if (error.message === "Usuário ou senha incorretos." || error.message === "Sua conta foi desativada.") {
+            throw error;
+          }
+          console.error("Erro interno no login:", error);
+          throw new Error("Ocorreu um erro no servidor. Tente novamente mais tarde.");
         }
-
-        const isValid = await bcrypt.compare(credentials.password, barber.password);
-
-        if (!isValid) {
-          throw new Error("Senha incorreta.");
-        }
-
-        if (!barber.active) {
-          throw new Error("Conta desativada.");
-        }
-
-        // Retornar objeto do usuário que ficará na sessão
-        return {
-          id: barber.id,
-          name: barber.name,
-          email: barber.email,
-          barbershopId: barber.barbershopId,
-          slug: barber.barbershop.slug,
-        };
       }
     })
   ],
