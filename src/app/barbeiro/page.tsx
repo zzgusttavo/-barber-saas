@@ -451,7 +451,7 @@ export default function AppDonoPage() {
               className={styles.primaryButton}
               style={{ backgroundColor: '#25D366', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: 'none', marginBottom: 0 }}
               onClick={() => {
-                const msg = encodeURIComponent("Olá! Agora nossa barbearia tem aplicativo próprio. Agende seu horário sem filas pelo nosso link oficial:\n\n👉 http://localhost:3000/agendar/teste");
+                const msg = encodeURIComponent("Olá! Agora nossa barbearia tem aplicativo próprio. Agende seu horário sem filas pelo nosso link oficial:\n\n👉 https://agendabarber.com/agendar/salaomodelo");
                 window.open(`https://wa.me/?text=${msg}`, '_blank');
               }}
             >
@@ -539,7 +539,7 @@ export default function AppDonoPage() {
             </div>
             <div>
               <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>Link Público da Barbearia</div>
-              <div style={{ fontSize: '0.875rem', color: 'var(--theme-text-muted)' }}>barbeiro.com/salaomodelo</div>
+              <div style={{ fontSize: '0.875rem', color: 'var(--theme-text-muted)' }}>agendabarber.com/agendar/salaomodelo</div>
             </div>
             <button 
               className={`${styles.actionButton} ${styles.btnPrimary}`} 
