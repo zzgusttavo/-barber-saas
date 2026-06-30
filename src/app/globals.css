@@ -38,6 +38,10 @@
   --transition-normal: 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 * {
   box-sizing: border-box;
   padding: 0;
