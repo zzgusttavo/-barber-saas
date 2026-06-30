@@ -28,7 +28,7 @@ export default function CTA() {
             href="/barbeiro" 
             className="inline-block px-10 py-5 rounded-full bg-black text-white font-black text-xl hover:bg-gray-900 transition-all hover:scale-105 shadow-2xl"
           >
-            Quero Começar por R$ 5
+            Quero Começar por R$ 5,00
           </Link>
         </motion.div>
       </div>

@@ -43,7 +43,7 @@ export default function Hero() {
               href="#planos" 
               className="w-full sm:w-auto px-8 py-4 rounded-full bg-primary text-black font-bold text-lg hover:bg-primary-hover transition-all hover:scale-105 shadow-[0_0_20px_rgba(34,197,94,0.4)]"
             >
-              Comece Agora por R$ 5
+              Comece Agora por R$ 5,00
             </Link>
           </div>
 
