@@ -63,6 +63,24 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
   const [isSuccess, setIsSuccess] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
+  const [slugStr, setSlugStr] = useState("");
+  const [businessName, setBusinessName] = useState("Carregando...");
+  
+  useEffect(() => {
+    params.then(p => {
+      setSlugStr(p.slug);
+      
+      const lsName = localStorage.getItem('barber_businessName');
+      const lsSlug = localStorage.getItem('barber_slug');
+      if (lsName && lsSlug === p.slug) {
+        setBusinessName(lsName);
+      } else {
+        const formatted = p.slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        setBusinessName(formatted);
+      }
+    });
+  }, [params]);
+  
   // Tabs: 'agendar' | 'perfil' | 'config'
   const [clientTab, setClientTab] = useState('agendar');
 
@@ -217,8 +235,10 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
         <>
           <div className={styles.heroSection}>
             <div className={styles.logoWrapper}>
-          <User size={48} color="var(--theme-accent)" />
-        </div>
+              <div style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--theme-accent)' }}>
+                {businessName.charAt(0).toUpperCase()}
+              </div>
+            </div>
 
         {/* Referência aos dados configurados pelo dono */}
         <div className={styles.socialRow}>
@@ -247,7 +267,8 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
           </a>
         </div>
 
-        <h1 className={styles.shopName}>Salão Modelo</h1>
+        <h1 className={styles.shopName}>{businessName}</h1>
+        <div className={styles.shopSubtitle}>Barbearia Premium</div>
       </div>
 
       {/* Bloco 1: Barbeiro */}
@@ -352,7 +373,7 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
           <div style={{ width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--theme-text-muted)', fontSize: '0.875rem' }}>Nome Completo</label>
-              <input className={styles.inputField} defaultValue="Cliente Exemplo" />
+              <input className={styles.inputField} defaultValue={authData.username || "Cliente"} />
             </div>
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--theme-text-muted)', fontSize: '0.875rem' }}>E-mail (Opcional)</label>
