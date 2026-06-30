@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import styles from './barbeiro.module.css';
 import { 
   User, Clock, CheckCircle2, Menu,
-  Calendar, Wallet, Settings, Link, Camera, Scissors, Trash2, Share2
+  Calendar, Wallet, Settings, Link, Camera, Scissors, Trash2, Share2,
+  CreditCard, ShieldCheck, Zap, AlertTriangle, X
 } from 'lucide-react';
 import { useSession } from "next-auth/react";
 
@@ -14,6 +15,28 @@ export default function AppDonoPage() {
   const [activeTab, setActiveTab] = useState('agenda');
   const [selectedFilterDate, setSelectedFilterDate] = useState(new Date().toDateString());
   const [filterBarberId, setFilterBarberId] = useState('all');
+
+  // Subscription state
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [cancelStep, setCancelStep] = useState(1); // 1=confirm, 2=reason, 3=done
+  const [cancelReason, setCancelReason] = useState('');
+  const subscriptionData = {
+    plan: 'Pro',
+    price: 49.90,
+    status: 'ativo', // ativo | cancelado | trial
+    nextBilling: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR'),
+    startDate: new Date().toLocaleDateString('pt-BR'),
+    features: [
+      'App de Agendamento para Clientes',
+      'Painel de Gestão Completo',
+      'Múltiplos Barbeiros / Profissionais',
+      'Robô de WhatsApp Automático',
+      'Confirmações e Lembretes por WhatsApp',
+      'Relatório de Caixa (Dia e Mês)',
+      'Link Público da Barbearia',
+      'Suporte via WhatsApp',
+    ]
+  };
   
   const [isMobile, setIsMobile] = useState(false);
   const [usePairingCode, setUsePairingCode] = useState(false);
@@ -293,6 +316,9 @@ export default function AppDonoPage() {
           </button>
           <button className={`${styles.menuItem} ${activeTab === 'config' ? styles.active : ''}`} onClick={() => handleTabChange('config')}>
             <Settings size={20} /> Configurações
+          </button>
+          <button className={`${styles.menuItem} ${activeTab === 'assinatura' ? styles.active : ''}`} onClick={() => handleTabChange('assinatura')} style={{ marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '1rem' }}>
+            <CreditCard size={20} /> Assinatura
           </button>
         </div>
       </div>
@@ -673,6 +699,210 @@ export default function AppDonoPage() {
               ))}
             </div>
 
+          </div>
+        </>
+      )}
+
+      {/* =========================================
+          ABA DE ASSINATURA
+          ========================================= */}
+      {activeTab === 'assinatura' && (
+        <div className={styles.content}>
+          <h2 className={styles.sectionTitle}>Minha Assinatura</h2>
+
+          {/* Card do Plano Atual */}
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(255,184,0,0.15) 0%, rgba(255,184,0,0.05) 100%)',
+            border: '1px solid var(--theme-accent)',
+            borderRadius: '16px',
+            padding: '1.5rem',
+            marginBottom: '1.5rem',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.06 }}>
+              <Zap size={120} color="var(--theme-accent)" />
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{ width: 44, height: 44, borderRadius: '12px', backgroundColor: 'var(--theme-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Zap size={22} color="#000" />
+                </div>
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: '1.25rem' }}>Plano {subscriptionData.plan}</div>
+                  <div style={{ color: 'var(--theme-text-muted)', fontSize: '0.8rem' }}>Acesso completo</div>
+                </div>
+              </div>
+              <div style={{
+                padding: '0.25rem 0.75rem',
+                borderRadius: '999px',
+                backgroundColor: subscriptionData.status === 'ativo' ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)',
+                color: subscriptionData.status === 'ativo' ? '#22c55e' : '#ef4444',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}>
+                {subscriptionData.status === 'ativo' ? '● Ativo' : '● Cancelado'}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.25rem', marginBottom: '1.25rem' }}>
+              <span style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--theme-accent)' }}>
+                R$ {subscriptionData.price.toFixed(2).replace('.', ',')}
+              </span>
+              <span style={{ color: 'var(--theme-text-muted)', fontSize: '0.9rem' }}>/mês</span>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+              <div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--theme-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.2rem' }}>Próxima cobrança</div>
+                <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{subscriptionData.nextBilling}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--theme-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.2rem' }}>Cliente desde</div>
+                <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{subscriptionData.startDate}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Benefícios Incluídos */}
+          <div style={{ backgroundColor: 'var(--theme-card)', borderRadius: '16px', padding: '1.5rem', marginBottom: '1.5rem', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
+              <ShieldCheck size={20} color="var(--theme-accent)" />
+              <span style={{ fontWeight: 700, fontSize: '1rem' }}>O que está incluído no seu plano</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {subscriptionData.features.map(feature => (
+                <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', backgroundColor: 'rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <CheckCircle2 size={13} color="#22c55e" />
+                  </div>
+                  <span style={{ fontSize: '0.9rem', color: 'var(--theme-text)' }}>{feature}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Histórico de Pagamentos (simulado) */}
+          <div style={{ backgroundColor: 'var(--theme-card)', borderRadius: '16px', padding: '1.5rem', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
+              <CreditCard size={20} color="var(--theme-accent)" />
+              <span style={{ fontWeight: 700, fontSize: '1rem' }}>Histórico de Pagamentos</span>
+            </div>
+            {[
+              { date: new Date().toLocaleDateString('pt-BR'), value: 49.90, status: 'Pago' },
+            ].map((payment, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>Plano Pro – {payment.date}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#22c55e', marginTop: '0.1rem' }}>✓ {payment.status}</div>
+                </div>
+                <div style={{ fontWeight: 700, fontSize: '1rem' }}>R$ {payment.value.toFixed(2).replace('.', ',')}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Botão Cancelar */}
+          <div style={{ borderTop: '1px solid rgba(239,68,68,0.2)', paddingTop: '1.5rem' }}>
+            <p style={{ fontSize: '0.8rem', color: 'var(--theme-text-muted)', marginBottom: '1rem', lineHeight: 1.5 }}>
+              O cancelamento é efetivo ao final do período pago. Você não será cobrado novamente após cancelar.
+            </p>
+            <button
+              onClick={() => setIsCancelModalOpen(true)}
+              style={{ width: '100%', padding: '0.875rem', backgroundColor: 'transparent', color: '#ef4444', border: '1px solid rgba(239,68,68,0.4)', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem', transition: 'all 0.2s' }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.08)')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+            >
+              Cancelar Assinatura
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Cancelamento */}
+      {isCancelModalOpen && (
+        <>
+          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 200 }} onClick={() => { setIsCancelModalOpen(false); setCancelStep(1); }} />
+          <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '90%', maxWidth: '420px', backgroundColor: 'var(--theme-bg)', zIndex: 201, borderRadius: '20px', padding: '2rem', border: '1px solid rgba(239,68,68,0.3)' }}>
+            
+            <button onClick={() => { setIsCancelModalOpen(false); setCancelStep(1); }} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', color: 'var(--theme-text-muted)', cursor: 'pointer' }}>
+              <X size={20} />
+            </button>
+
+            {cancelStep === 1 && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '1rem' }}>
+                <div style={{ width: 64, height: 64, borderRadius: '50%', backgroundColor: 'rgba(239,68,68,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.5rem' }}>
+                  <AlertTriangle size={32} color="#ef4444" />
+                </div>
+                <h2 style={{ fontSize: '1.375rem', fontWeight: 800 }}>Tem certeza?</h2>
+                <p style={{ color: 'var(--theme-text-muted)', lineHeight: 1.6 }}>
+                  Ao cancelar, você perderá acesso ao app de agendamentos, ao robô de WhatsApp e a todos os recursos ao final do período atual.
+                </p>
+                <div style={{ backgroundColor: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '10px', padding: '1rem', width: '100%', textAlign: 'left' }}>
+                  <p style={{ fontSize: '0.875rem', color: '#ef4444', fontWeight: 600, marginBottom: '0.5rem' }}>Você vai perder:</p>
+                  {['App de agendamento dos seus clientes', 'Robô de WhatsApp automático', 'Painel de caixa e relatórios', 'Suporte prioritário'].map(item => (
+                    <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem', color: 'var(--theme-text-muted)', fontSize: '0.875rem' }}>
+                      <span style={{ color: '#ef4444' }}>✕</span> {item}
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setCancelStep(2)}
+                  style={{ width: '100%', padding: '0.875rem', backgroundColor: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem' }}
+                >
+                  Continuar com o cancelamento
+                </button>
+                <button
+                  onClick={() => { setIsCancelModalOpen(false); setCancelStep(1); }}
+                  className={styles.primaryButton}
+                  style={{ margin: 0, width: '100%' }}
+                >
+                  Manter minha assinatura
+                </button>
+              </div>
+            )}
+
+            {cancelStep === 2 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Nos conte o motivo</h2>
+                <p style={{ color: 'var(--theme-text-muted)', fontSize: '0.875rem' }}>Sua opinião é importante para melhorarmos o sistema.</p>
+                {['Está caro demais', 'Não estou usando', 'Faltam funcionalidades', 'Preferi outro sistema', 'Problemas técnicos', 'Outro motivo'].map(reason => (
+                  <button
+                    key={reason}
+                    onClick={() => setCancelReason(reason)}
+                    style={{ padding: '0.875rem 1rem', borderRadius: '10px', border: cancelReason === reason ? '2px solid #ef4444' : '1px solid rgba(255,255,255,0.1)', backgroundColor: cancelReason === reason ? 'rgba(239,68,68,0.1)' : 'var(--theme-card)', color: cancelReason === reason ? '#ef4444' : 'var(--theme-text)', fontWeight: cancelReason === reason ? 700 : 400, cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s' }}
+                  >
+                    {reason}
+                  </button>
+                ))}
+                <button
+                  disabled={!cancelReason}
+                  onClick={() => setCancelStep(3)}
+                  style={{ padding: '0.875rem', backgroundColor: cancelReason ? '#ef4444' : 'rgba(239,68,68,0.2)', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: cancelReason ? 'pointer' : 'not-allowed', marginTop: '0.5rem', opacity: cancelReason ? 1 : 0.5 }}
+                >
+                  Confirmar Cancelamento
+                </button>
+              </div>
+            )}
+
+            {cancelStep === 3 && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '1rem' }}>
+                <CheckCircle2 size={56} color="#22c55e" />
+                <h2 style={{ fontSize: '1.375rem', fontWeight: 800 }}>Cancelamento Registrado</h2>
+                <p style={{ color: 'var(--theme-text-muted)', lineHeight: 1.6 }}>
+                  Sua assinatura foi cancelada. Você continua com acesso total até o fim do período pago. Sentiremos sua falta! 😢
+                </p>
+                <button
+                  onClick={() => { setIsCancelModalOpen(false); setCancelStep(1); }}
+                  className={styles.primaryButton}
+                  style={{ margin: 0, width: '100%' }}
+                >
+                  Fechar
+                </button>
+              </div>
+            )}
           </div>
         </>
       )}
