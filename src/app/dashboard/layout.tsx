@@ -24,6 +24,9 @@ const IconSettings = () => (
 const IconCreditCard = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
 );
+const IconWallet = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><rect x="3" y="7" width="18" height="14" rx="2" ry="2"/><path d="M18 12h.01"/></svg>
+);
 
 const NAV_ITEMS = [
   { label: 'Resumo', href: '/dashboard', icon: IconDashboard },
@@ -31,6 +34,7 @@ const NAV_ITEMS = [
   { label: 'Clientes', href: '/dashboard/clientes', icon: IconUsers },
   { label: 'Profissionais', href: '/dashboard/profissionais', icon: IconScissors },
   { label: 'Serviços', href: '/dashboard/servicos', icon: IconScissors },
+  { label: 'Caixa', href: '/dashboard/caixa', icon: IconWallet },
   { label: 'Assinatura', href: '/dashboard/assinatura', icon: IconCreditCard },
   { label: 'Configurações', href: '/dashboard/configuracoes', icon: IconSettings },
 ];

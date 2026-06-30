@@ -69,12 +69,12 @@ export default function DashboardPage() {
             <Card>
               <CardContent className={styles.metricCard}>
                 <div className={styles.metricHeader}>
-                  <span className={styles.metricTitle}>Faturamento Previsto</span>
+                  <span className={styles.metricTitle}>Faturamento Mensal</span>
                   <TrendingUp className={styles.metricIcon} size={24} />
                 </div>
-                <div className={styles.metricValue}>640<span style={{ fontSize: '1.5rem', marginLeft: '0.25rem', color: 'var(--text-secondary)' }}>BRL</span></div>
+                <div className={styles.metricValue}>12.450<span style={{ fontSize: '1.5rem', marginLeft: '0.25rem', color: 'var(--text-secondary)' }}>BRL</span></div>
                 <div className={styles.metricSubtext}>
-                  Para o dia de hoje
+                  Em Junho de 2026
                 </div>
               </CardContent>
             </Card>
