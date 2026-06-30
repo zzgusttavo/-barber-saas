@@ -7,8 +7,8 @@ import Link from "next/link";
 export default function Hero() {
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-16 overflow-hidden bg-background">
-      {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
+      {/* Background Glow - Hidden on mobile for performance */}
+      <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
       
       {/* Centered Animated Title */}
       <motion.div
@@ -17,7 +17,7 @@ export default function Hero() {
         transition={{ duration: 1, ease: "easeOut" }}
         className="relative z-20 text-center mb-16 w-full"
       >
-        <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-[140px] font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white/80 to-white/20 tracking-tighter uppercase drop-shadow-[0_0_30px_rgba(255,255,255,0.2)] flex flex-col md:flex-row items-center justify-center">
+        <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-[140px] font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white/80 to-white/20 tracking-tighter uppercase md:drop-shadow-[0_0_30px_rgba(255,255,255,0.2)] flex flex-col md:flex-row items-center justify-center">
           <span>Agenda</span><span className="text-primary bg-clip-text bg-gradient-to-b from-primary via-primary/80 to-primary/20">Barber</span>
         </h1>
       </motion.div>
@@ -62,12 +62,12 @@ export default function Hero() {
           </div>
         </motion.div>
 
-        {/* Right Side - Floating Mockup */}
+        {/* Right Side - Floating Mockup (Hidden on mobile for performance) */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="relative lg:h-[600px] flex items-center justify-center"
+          className="hidden lg:flex relative h-[600px] items-center justify-center"
         >
           {/* Main Dashboard Panel */}
           <motion.div 

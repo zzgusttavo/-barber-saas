@@ -29,7 +29,7 @@ export default function Solution() {
   return (
     <section className="py-24 bg-background relative overflow-hidden" id="recursos">
       {/* Glow */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
+      <div className="hidden md:block absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
 
       <div className="container mx-auto px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">

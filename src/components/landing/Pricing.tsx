@@ -42,7 +42,7 @@ export default function Pricing() {
           <div className="relative p-1 rounded-3xl bg-gradient-to-b from-primary/50 to-background">
             <div className="bg-card rounded-[22px] p-8 sm:p-10 text-center relative overflow-hidden">
               {/* Glow */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200px] h-[200px] bg-primary/20 blur-[60px] pointer-events-none" />
+              <div className="hidden md:block absolute top-0 left-1/2 -translate-x-1/2 w-[200px] h-[200px] bg-primary/20 blur-[60px] pointer-events-none" />
               
               <h3 className="text-2xl font-bold text-white mb-2 relative z-10">Plano Agenda Barber</h3>
               <p className="text-text-secondary mb-6 relative z-10">Tudo incluso. Sem taxas escondidas.</p>
