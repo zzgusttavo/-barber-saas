@@ -45,6 +45,11 @@ export default function OnboardingPage() {
       setDirection(1);
       setCurrentStep((prev) => prev + 1);
     } else {
+      const generatedSlug = formData.businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+      localStorage.setItem('barber_businessName', formData.businessName);
+      localStorage.setItem('barber_slug', generatedSlug);
+      localStorage.setItem('barber_fullName', formData.fullName);
+      localStorage.setItem('barber_phone', formData.phone);
       router.push("/barbeiro");
     }
   };

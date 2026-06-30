@@ -21,7 +21,24 @@ export default function AppDonoPage() {
   const [waCode, setWaCode] = useState<string | null>(null);
   const [waStatus, setWaStatus] = useState('loading'); // loading, pending, connected
 
+  const [businessName, setBusinessName] = useState("Salão Modelo");
+  const [slug, setSlug] = useState("salaomodelo");
+  const [ownerName, setOwnerName] = useState("Carlos Eduardo");
+  const [ownerPhone, setOwnerPhone] = useState("(11) 99999-9999");
+
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const bn = localStorage.getItem('barber_businessName');
+      const sl = localStorage.getItem('barber_slug');
+      const on = localStorage.getItem('barber_fullName');
+      const op = localStorage.getItem('barber_phone');
+      
+      if (bn) setBusinessName(bn);
+      if (sl) setSlug(sl);
+      if (on) setOwnerName(on);
+      if (op) setOwnerPhone(op);
+    }
+
     const checkMobile = () => {
       const mobile = window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       setIsMobile(mobile);
@@ -194,7 +211,7 @@ export default function AppDonoPage() {
             <User size={32} />
           </div>
           <div>
-            <div className={styles.drawerName}>Carlos Eduardo</div>
+            <div className={styles.drawerName}>{ownerName}</div>
             <div className={styles.drawerRole}>Dono da Barbearia</div>
           </div>
         </div>
@@ -451,7 +468,7 @@ export default function AppDonoPage() {
               className={styles.primaryButton}
               style={{ backgroundColor: '#25D366', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: 'none', marginBottom: 0 }}
               onClick={() => {
-                const msg = encodeURIComponent("Olá! Agora nossa barbearia tem aplicativo próprio. Agende seu horário sem filas pelo nosso link oficial:\n\n👉 https://agendabarber.com/agendar/salaomodelo");
+                const msg = encodeURIComponent(`Olá! Agora nossa barbearia tem aplicativo próprio. Agende seu horário sem filas pelo nosso link oficial:\n\n👉 https://agendabarber.com/agendar/${slug}`);
                 window.open(`https://wa.me/?text=${msg}`, '_blank');
               }}
             >
@@ -461,12 +478,12 @@ export default function AppDonoPage() {
           
           <div className={styles.inputGroup}>
             <label className={styles.inputLabel}>Nome do Estabelecimento</label>
-            <input className={styles.inputField} defaultValue="Salão Modelo" />
+            <input className={styles.inputField} value={businessName} onChange={(e) => setBusinessName(e.target.value)} />
           </div>
 
           <div className={styles.inputGroup}>
             <label className={styles.inputLabel}>WhatsApp (Contato)</label>
-            <input className={styles.inputField} type="tel" defaultValue="(11) 99999-9999" placeholder="Aparecerá no app do cliente" />
+            <input className={styles.inputField} type="tel" value={ownerPhone} onChange={(e) => setOwnerPhone(e.target.value)} placeholder="Aparecerá no app do cliente" />
           </div>
 
           <div className={styles.inputGroup}>
@@ -539,7 +556,7 @@ export default function AppDonoPage() {
             </div>
             <div>
               <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>Link Público da Barbearia</div>
-              <div style={{ fontSize: '0.875rem', color: 'var(--theme-text-muted)' }}>agendabarber.com/agendar/salaomodelo</div>
+              <div style={{ fontSize: '0.875rem', color: 'var(--theme-text-muted)' }}>agendabarber.com/agendar/{slug}</div>
             </div>
             <button 
               className={`${styles.actionButton} ${styles.btnPrimary}`} 
@@ -595,7 +612,7 @@ export default function AppDonoPage() {
 
           <div className={styles.inputGroup}>
             <label className={styles.inputLabel}>Seu Nome</label>
-            <input className={styles.inputField} defaultValue="Carlos Eduardo" />
+            <input className={styles.inputField} value={ownerName} onChange={(e) => setOwnerName(e.target.value)} />
           </div>
         </div>
       )}
