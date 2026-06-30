@@ -16,16 +16,17 @@ export default function AppDonoPage() {
   const [selectedFilterDate, setSelectedFilterDate] = useState(new Date().toDateString());
   const [filterBarberId, setFilterBarberId] = useState('all');
 
-  // Subscription state
+  // Subscription state (dados reais do MP)
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
-  const [cancelStep, setCancelStep] = useState(1); // 1=confirm, 2=reason, 3=done
+  const [cancelStep, setCancelStep] = useState(1);
   const [cancelReason, setCancelReason] = useState('');
-  const subscriptionData = {
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [subscriptionData, setSubscriptionData] = useState<any>({
     plan: 'Pro',
     price: 49.90,
-    status: 'ativo', // ativo | cancelado | trial
-    nextBilling: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR'),
-    startDate: new Date().toLocaleDateString('pt-BR'),
+    status: 'pending',
+    nextBilling: '—',
+    startDate: '—',
     features: [
       'App de Agendamento para Clientes',
       'Painel de Gestão Completo',
@@ -36,7 +37,8 @@ export default function AppDonoPage() {
       'Link Público da Barbearia',
       'Suporte via WhatsApp',
     ]
-  };
+  });
+
   
   const [isMobile, setIsMobile] = useState(false);
   const [usePairingCode, setUsePairingCode] = useState(false);
@@ -165,6 +167,59 @@ export default function AppDonoPage() {
     loadData();
   }, []);
 
+  // Buscar status real da assinatura do MP
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+    fetch('/api/subscriptions/status')
+      .then(res => res.json())
+      .then(data => {
+        if (data && !data.error) {
+          const mpStatus = data.mpSubscriptionStatus;
+          // Mapear status do MP para labels amigáveis
+          const statusMap: Record<string, string> = {
+            authorized: 'ativo',
+            paused: 'pausado',
+            cancelled: 'cancelado',
+            pending: 'pendente',
+          };
+          setSubscriptionData((prev: any) => ({
+            ...prev,
+            status: statusMap[mpStatus] || mpStatus || 'pendente',
+            nextBilling: data.mpNextBillingDate
+              ? new Date(data.mpNextBillingDate).toLocaleDateString('pt-BR')
+              : '—',
+            startDate: data.createdAt
+              ? new Date(data.createdAt).toLocaleDateString('pt-BR')
+              : '—',
+          }));
+        }
+      })
+      .catch(err => console.error('Erro ao buscar status da assinatura:', err));
+  }, [status]);
+
+  // Cancelamento real no Mercado Pago
+  const handleRealCancel = async () => {
+    setIsCancelling(true);
+    try {
+      const res = await fetch('/api/subscriptions/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: cancelReason }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSubscriptionData((prev: any) => ({ ...prev, status: 'cancelado' }));
+        setCancelStep(3);
+      } else {
+        alert(data.error || 'Erro ao cancelar. Tente novamente.');
+      }
+    } catch (err) {
+      alert('Erro de conexão. Tente novamente.');
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
   const handleComplete = async (id: string) => {
     try {
       await fetch(`/api/appointments/${id}`, {
@@ -177,6 +232,7 @@ export default function AppDonoPage() {
       console.error(err);
     }
   };
+
 
   const handleAddService = async () => {
     if(!newService.name || !newService.price) return alert("Preencha nome e preço!");
@@ -878,11 +934,11 @@ export default function AppDonoPage() {
                   </button>
                 ))}
                 <button
-                  disabled={!cancelReason}
-                  onClick={() => setCancelStep(3)}
-                  style={{ padding: '0.875rem', backgroundColor: cancelReason ? '#ef4444' : 'rgba(239,68,68,0.2)', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: cancelReason ? 'pointer' : 'not-allowed', marginTop: '0.5rem', opacity: cancelReason ? 1 : 0.5 }}
+                  disabled={!cancelReason || isCancelling}
+                  onClick={handleRealCancel}
+                  style={{ padding: '0.875rem', backgroundColor: cancelReason ? '#ef4444' : 'rgba(239,68,68,0.2)', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: cancelReason ? 'pointer' : 'not-allowed', marginTop: '0.5rem', opacity: cancelReason && !isCancelling ? 1 : 0.5 }}
                 >
-                  Confirmar Cancelamento
+                  {isCancelling ? 'Cancelando...' : 'Confirmar Cancelamento'}
                 </button>
               </div>
             )}
