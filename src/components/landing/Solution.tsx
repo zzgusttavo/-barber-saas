@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CalendarClock, Users, BarChart, Bell, Smartphone, Scissors } from "lucide-react";
+import { Calendar, Users, BarChart, Bell, Smartphone, Scissors } from "lucide-react";
 
 const features = [
-  { icon: CalendarClock, title: "Agendamento Online", desc: "Seu cliente agenda sozinho 24h por dia." },
+  { icon: Calendar, title: "Agendamento Online", desc: "Seu cliente agenda sozinho 24h por dia." },
   { icon: Users, title: "Gestão de Clientes", desc: "Histórico completo de quem frequenta seu salão." },
   { icon: Bell, title: "Lembretes no Zap", desc: "Reduza faltas com mensagens automáticas." },
   { icon: BarChart, title: "Relatórios", desc: "Saiba exatamente quanto você está ganhando." },
