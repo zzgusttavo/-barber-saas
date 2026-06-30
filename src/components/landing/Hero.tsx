@@ -6,20 +6,32 @@ import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-24 overflow-hidden bg-background">
+    <section className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-16 overflow-hidden bg-background">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
       
-      <div className="container mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center relative z-10">
+      {/* Centered Animated Title */}
+      <motion.div
+        initial={{ opacity: 0, y: -50, scale: 0.8 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 1, ease: "easeOut" }}
+        className="relative z-20 text-center mb-16 w-full"
+      >
+        <h1 className="text-6xl md:text-8xl lg:text-[140px] font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white/80 to-white/20 tracking-tighter uppercase drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+          Agenda<span className="text-primary bg-clip-text bg-gradient-to-b from-primary via-primary/80 to-primary/20">Barber</span>
+        </h1>
+      </motion.div>
+
+      <div className="container mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center relative z-10 mt-8">
         
         {/* Left Side */}
         <motion.div 
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
           className="max-w-2xl"
         >
-          <h1 className="text-5xl lg:text-7xl font-black text-white leading-[1.1] tracking-tight mb-6">
+          <h2 className="text-4xl lg:text-5xl font-black text-white leading-[1.1] tracking-tight mb-6">
             Sua barbearia merece mais clientes e <span className="text-primary">menos bagunça.</span>
           </h1>
           <p className="text-lg lg:text-xl text-text-secondary mb-10 max-w-lg leading-relaxed">
