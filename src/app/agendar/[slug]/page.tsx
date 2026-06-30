@@ -40,13 +40,15 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
   const [services, setServices] = useState<any[]>(mockServices);
 
   useEffect(() => {
-    fetch('/api/barbers').then(r => r.json()).then(data => setBarbers(data));
+    // We'll fetch barbers when we fetch the barbershop by slug
     fetch('/api/services').then(r => r.json()).then(data => {
       const withIcons = data.map((s: any) => ({
         ...s,
         icon: s.name.toLowerCase().includes('barba') && s.name.toLowerCase().includes('corte') ? ComboIcon : (s.name.toLowerCase().includes('barba') ? MustacheIcon : Scissors)
       }));
       setServices(withIcons);
+    }).catch(() => {
+      // Falta o endpoint /api/services, mantém mock
     });
   }, []);
 
@@ -70,14 +72,20 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
     params.then(p => {
       setSlugStr(p.slug);
       
-      const lsName = localStorage.getItem('barber_businessName');
-      const lsSlug = localStorage.getItem('barber_slug');
-      if (lsName && lsSlug === p.slug) {
-        setBusinessName(lsName);
-      } else {
-        const formatted = p.slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-        setBusinessName(formatted);
-      }
+      fetch(`/api/barbershops/${p.slug}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            setBusinessName("Barbearia não encontrada");
+            setBarbers([]);
+          } else {
+            setBusinessName(data.name);
+            setBarbers(data.barbers || []);
+          }
+        })
+        .catch(() => {
+          setBusinessName("Erro ao carregar");
+        });
     });
   }, [params]);
   
