@@ -33,12 +33,6 @@ export default function Hero() {
             >
               Comece Agora por R$ 5
             </Link>
-            <Link 
-              href="/agendar/salaomodelo" 
-              className="w-full sm:w-auto px-8 py-4 rounded-full bg-card text-white border border-white/10 font-bold text-lg hover:bg-white/5 transition-all hover:scale-105"
-            >
-              Ver Demonstração
-            </Link>
           </div>
 
           <div className="flex items-center gap-4">

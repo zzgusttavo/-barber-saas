@@ -12,7 +12,7 @@ export default function Footer() {
             <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
               <Scissors size={18} />
             </div>
-            BarberFlow
+            BarberSaaS
           </div>
           
           <div className="flex gap-6 text-text-secondary">
@@ -23,7 +23,7 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/5 text-sm text-text-secondary gap-4">
-          <p>© 2026 BarberFlow. Todos os direitos reservados.</p>
+          <p>© 2026 BarberSaaS. Todos os direitos reservados.</p>
           <div className="flex gap-4">
             <Link href="#" className="hover:text-white transition-colors">Política de Privacidade</Link>
             <Link href="#" className="hover:text-white transition-colors">Termos de Uso</Link>

@@ -42,7 +42,7 @@ export default function Solution() {
             Tudo o que sua barbearia precisa em um <span className="text-primary">único sistema.</span>
           </motion.h2>
           <p className="text-text-secondary text-lg">
-            Esqueça as planilhas e cadernos. O BarberFlow tem todas as ferramentas para profissionalizar seu negócio.
+            Esqueça as planilhas e cadernos. O BarberSaaS tem todas as ferramentas para profissionalizar seu negócio.
           </p>
         </div>
 
