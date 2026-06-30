@@ -27,7 +27,7 @@ export default function Navbar() {
       </div>
 
       <div className="flex items-center gap-4">
-        <Link href="/barbeiro" className="hidden md:block text-sm font-medium text-white hover:text-primary transition-colors">
+        <Link href="/login" className="hidden md:block text-sm font-medium text-white hover:text-primary transition-colors">
           Entrar
         </Link>
         <Link 
