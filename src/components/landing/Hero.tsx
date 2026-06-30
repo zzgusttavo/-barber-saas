@@ -17,8 +17,8 @@ export default function Hero() {
         transition={{ duration: 1, ease: "easeOut" }}
         className="relative z-20 text-center mb-16 w-full"
       >
-        <h1 className="text-6xl md:text-8xl lg:text-[140px] font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white/80 to-white/20 tracking-tighter uppercase drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">
-          Agenda<span className="text-primary bg-clip-text bg-gradient-to-b from-primary via-primary/80 to-primary/20">Barber</span>
+        <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-[140px] font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white/80 to-white/20 tracking-tighter uppercase drop-shadow-[0_0_30px_rgba(255,255,255,0.2)] flex flex-col md:flex-row items-center justify-center">
+          <span>Agenda</span><span className="text-primary bg-clip-text bg-gradient-to-b from-primary via-primary/80 to-primary/20">Barber</span>
         </h1>
       </motion.div>
 
