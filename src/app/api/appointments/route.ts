@@ -1,16 +1,33 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { ensureDefaultData } from '@/lib/db-seed';
+import { PrismaClient } from '@prisma/client';
+import { getServerSession } from "next-auth/next";
+
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
+const prisma = globalForPrisma.prisma || new PrismaClient();
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const date = searchParams.get('date'); // optional
-    const status = searchParams.get('status'); // optional
+    // 1. Obter sessão do barbeiro autenticado
+    const session = await getServerSession();
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
 
-    const whereClause: any = {};
+    const barbershopId = (session.user as any).barbershopId;
+    if (!barbershopId) {
+      return NextResponse.json({ error: 'Sessão inválida' }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const date = searchParams.get('date');
+    const status = searchParams.get('status');
+
+    const whereClause: any = {
+      barbershopId: barbershopId
+    };
+
     if (date) {
-      // Find appointments for a specific date (start of day to end of day)
       const startDate = new Date(date);
       startDate.setHours(0, 0, 0, 0);
       const endDate = new Date(date);
@@ -43,20 +60,38 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { clientName, whatsapp, password, date, time, serviceName, price } = body;
+    const { slug, clientName, whatsapp, password, date, time, serviceName, price, barberId } = body;
 
-    const { barbershop, barber, service: defaultService } = await ensureDefaultData();
+    // 1. Encontrar a barbearia pelo slug
+    const barbershop = await prisma.barbershop.findUnique({
+      where: { slug }
+    });
 
-    // 1. Encontrar ou criar o Cliente
-    let client = await prisma.client.findUnique({
-      where: { username: clientName }
+    if (!barbershop) {
+      return NextResponse.json({ error: 'Barbearia não encontrada' }, { status: 404 });
+    }
+
+    // Usar o barberId passado ou pegar o primeiro barbeiro da barbearia
+    let finalBarberId = barberId;
+    if (!finalBarberId) {
+      const firstBarber = await prisma.barber.findFirst({ where: { barbershopId: barbershop.id } });
+      if (firstBarber) finalBarberId = firstBarber.id;
+    }
+
+    if (!finalBarberId) {
+      return NextResponse.json({ error: 'Nenhum barbeiro disponível' }, { status: 400 });
+    }
+
+    // 2. Encontrar ou criar o Cliente
+    let client = await prisma.client.findFirst({
+      where: { whatsapp, barbershopId: barbershop.id }
     });
 
     if (!client) {
       client = await prisma.client.create({
         data: {
           name: clientName,
-          username: clientName,
+          username: whatsapp, // usando whatsapp como username para facilitar
           whatsapp,
           password,
           barbershopId: barbershop.id
@@ -64,7 +99,7 @@ export async function POST(request: Request) {
       });
     }
 
-    // 2. Garantir o Serviço
+    // 3. Garantir o Serviço
     let service = await prisma.service.findFirst({
       where: { name: serviceName, barbershopId: barbershop.id }
     });
@@ -80,8 +115,7 @@ export async function POST(request: Request) {
       });
     }
 
-    // 3. Criar o Agendamento
-    // Converter 'YYYY-MM-DD' e 'HH:MM' para DateTime
+    // 4. Criar o Agendamento
     const [yyyy, mm, dd] = date.split('-');
     const [hh, min] = time.split(':');
     const appointmentDate = new Date(Number(yyyy), Number(mm) - 1, Number(dd), Number(hh), Number(min), 0);
@@ -90,7 +124,7 @@ export async function POST(request: Request) {
       data: {
         date: appointmentDate,
         status: 'PENDING',
-        barberId: barber.id,
+        barberId: finalBarberId,
         serviceId: service.id,
         clientId: client.id,
         barbershopId: barbershop.id
@@ -101,40 +135,25 @@ export async function POST(request: Request) {
       }
     });
 
-    // 4. Automação de WhatsApp (Webhook/Evolution API)
-    // Dispara a mensagem automática confirmando o agendamento
+    // 5. Automação de WhatsApp
     try {
       const msgText = `Olá ${clientName}! Seu agendamento na ${barbershop.name} foi confirmado.\n\n✂️ Serviço: ${service.name}\n📅 Data: ${date} às ${time}\n💰 Valor: R$ ${service.price.toFixed(2)}`;
       
-      console.log(`\n[WHATSAPP AUTOMATION] 🚀 Disparando mensagem automática para ${whatsapp}:`);
-      console.log(msgText);
-      console.log(`------------------------------------------------------\n`);
+      console.log(`[WHATSAPP] Disparando mensagem para ${whatsapp}: ${msgText}`);
 
-      // Integração real com o Microserviço Baileys local
-      const res = await fetch('http://localhost:3005/send', {
+      fetch('http://localhost:3005/send', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          number: whatsapp,
-          message: msgText
-        })
-      });
-
-      if (!res.ok) {
-        console.warn("[WHATSAPP] O microserviço retornou erro ou o WhatsApp não está conectado.");
-      } else {
-        console.log("[WHATSAPP] Mensagem disparada com sucesso via microserviço Baileys!");
-      }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ number: whatsapp, message: msgText })
+      }).catch(e => console.error("Falha ao notificar microserviço:", e));
 
     } catch (waError) {
       console.error("Erro na automação do WhatsApp:", waError);
     }
 
-    return NextResponse.json(appointment);
+    return NextResponse.json(appointment, { status: 201 });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: 'Erro ao criar agendamento' }, { status: 500 });
+    return NextResponse.json({ error: 'Erro interno ao criar agendamento' }, { status: 500 });
   }
 }

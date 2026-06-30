@@ -120,6 +120,8 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            slug: slugStr,
+            barberId: selectedBarber,
             clientName: authData.username,
             whatsapp: authData.whatsapp,
             password: authData.password,
