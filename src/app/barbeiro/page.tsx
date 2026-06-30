@@ -6,6 +6,7 @@ import {
   User, Clock, CheckCircle2, Menu,
   Calendar, Wallet, Settings, Link, Camera, Scissors, Trash2, Share2
 } from 'lucide-react';
+import { useSession } from "next-auth/react";
 
 export default function AppDonoPage() {
   const [appointments, setAppointments] = useState<any[]>([]);
@@ -29,28 +30,27 @@ export default function AppDonoPage() {
   const [domainHost, setDomainHost] = useState("");
   const [domainOrigin, setDomainOrigin] = useState("");
 
+  const { data: session, status } = useSession();
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const sl = localStorage.getItem('barber_slug');
-      if (!sl) {
-        window.location.href = '/';
-        return;
-      }
-      
+    if (status === 'unauthenticated') {
+      window.location.href = '/';
+      return;
+    }
+
+    if (status === 'authenticated' && session?.user) {
       setDomainHost(window.location.host);
       setDomainOrigin(window.location.origin);
-      const bn = localStorage.getItem('barber_businessName');
-      const on = localStorage.getItem('barber_fullName');
-      const op = localStorage.getItem('barber_phone');
       
-      if (bn) setBusinessName(bn);
-      setSlug(sl);
-      if (on) setOwnerName(on);
-      if (op) setOwnerPhone(op);
+      const user = session.user as any;
+      setSlug(user.slug || "");
+      setOwnerName(user.name || "");
       
       setIsLoaded(true);
     }
+  }, [session, status]);
 
+  useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       setIsMobile(mobile);

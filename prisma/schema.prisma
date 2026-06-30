@@ -4,8 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ----------------------------------------------------------------------------
@@ -17,6 +18,7 @@ datasource db {
 model Barbershop {
   id        String   @id @default(uuid())
   name      String
+  slug      String   @unique
   phone     String?
   address   String?
   createdAt DateTime @default(now())
@@ -33,7 +35,7 @@ model Barber {
   id           String   @id @default(uuid())
   name         String
   phone        String?
-  username     String   @unique
+  email        String   @unique
   password     String
   active       Boolean  @default(true)
   barbershopId String

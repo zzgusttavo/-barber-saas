@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Scissors, Building2, Store, Check, ArrowLeft, ArrowRight, Lock } from "lucide-react";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 const TOTAL_STEPS = 4;
 
@@ -40,17 +41,38 @@ export default function OnboardingPage() {
     setFormData((prev) => ({ ...prev, teamSize: size }));
   };
 
-  const nextStep = () => {
+  const nextStep = async () => {
     if (currentStep < TOTAL_STEPS) {
       setDirection(1);
       setCurrentStep((prev) => prev + 1);
     } else {
-      const generatedSlug = formData.businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-      localStorage.setItem('barber_businessName', formData.businessName);
-      localStorage.setItem('barber_slug', generatedSlug);
-      localStorage.setItem('barber_fullName', formData.fullName);
-      localStorage.setItem('barber_phone', formData.phone);
-      router.push("/barbeiro");
+      try {
+        const response = await fetch('/api/onboarding', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+           const result = await signIn('credentials', {
+             redirect: false,
+             email: formData.email,
+             password: formData.password
+           });
+           
+           if (result?.ok) {
+             router.push('/barbeiro');
+           } else {
+             alert('Erro ao fazer login automático após o cadastro.');
+           }
+        } else {
+           alert(data.error || 'Erro ao realizar cadastro.');
+        }
+      } catch (error) {
+        alert('Erro de comunicação com o servidor.');
+      }
     }
   };
 
