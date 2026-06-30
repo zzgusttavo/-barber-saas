@@ -37,6 +37,7 @@ model Barber {
   phone        String?
   email        String   @unique
   password     String
+  role         String   @default("BARBER") // OWNER | BARBER
   active       Boolean  @default(true)
   barbershopId String
   createdAt    DateTime @default(now())

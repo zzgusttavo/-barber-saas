@@ -50,6 +50,7 @@ export async function POST(req: Request) {
           email: email,
           phone: phone,
           password: hashedPassword,
+          role: 'OWNER', // Criador da barbearia é sempre o DONO
           barbershopId: shop.id
         }
       });

@@ -28,6 +28,9 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Barbearia não encontrada ou não autorizado' }, { status: 403 });
     }
 
+    // Se veio pelo slug (app do cliente), esconde dados sensíveis
+    const isPublicRequest = !!slug;
+
     const barbers = await prisma.barber.findMany({
       where: { 
         barbershopId: targetBarbershopId,
@@ -36,8 +39,9 @@ export async function GET(request: Request) {
       select: {
         id: true,
         name: true,
-        email: true, // Only return email to owner in a real app, but fine for MVP
-        active: true
+        email: !isPublicRequest, // Email só visível para o painel do dono
+        active: !isPublicRequest,
+        role: !isPublicRequest,
       },
       orderBy: { name: 'asc' }
     });
@@ -57,8 +61,15 @@ export async function POST(request: Request) {
     }
 
     const barbershopId = (session.user as any).barbershopId;
-    const body = await request.json();
+    const userId = (session.user as any).id;
 
+    // Somente o DONO (role OWNER) pode cadastrar novos barbeiros
+    const currentBarber = await prisma.barber.findUnique({ where: { id: userId } });
+    if (!currentBarber || currentBarber.role !== 'OWNER') {
+      return NextResponse.json({ error: 'Apenas o dono da barbearia pode gerenciar a equipe.' }, { status: 403 });
+    }
+
+    const body = await request.json();
     const { name, email, password, phone } = body;
 
     if (!name || !email || !password) {
@@ -95,6 +106,14 @@ export async function DELETE(request: Request) {
     const session = await getServerSession();
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
+    const userId = (session.user as any).id;
+
+    // Somente o DONO pode desativar barbeiros
+    const currentBarber = await prisma.barber.findUnique({ where: { id: userId } });
+    if (!currentBarber || currentBarber.role !== 'OWNER') {
+      return NextResponse.json({ error: 'Apenas o dono da barbearia pode gerenciar a equipe.' }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
