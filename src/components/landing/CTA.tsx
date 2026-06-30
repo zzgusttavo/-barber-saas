@@ -21,7 +21,7 @@ export default function CTA() {
             Sua agenda pode ser muito mais organizada.
           </h2>
           <p className="text-xl text-black/80 mb-10 font-medium">
-            Experimente o BarberSaaS e descubra como é simples gerenciar sua barbearia com uma plataforma moderna, rápida e intuitiva.
+            Experimente o Agenda Barber e descubra como é simples gerenciar sua barbearia com uma plataforma moderna, rápida e intuitiva.
           </p>
           
           <Link 

@@ -44,7 +44,7 @@ export default function Pricing() {
               {/* Glow */}
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200px] h-[200px] bg-primary/20 blur-[60px] pointer-events-none" />
               
-              <h3 className="text-2xl font-bold text-white mb-2 relative z-10">Plano BarberSaaS</h3>
+              <h3 className="text-2xl font-bold text-white mb-2 relative z-10">Plano Agenda Barber</h3>
               <p className="text-text-secondary mb-6 relative z-10">Tudo incluso. Sem taxas escondidas.</p>
               
               <div className="mb-8 relative z-10">
