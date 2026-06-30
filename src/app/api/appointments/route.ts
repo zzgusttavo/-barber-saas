@@ -8,24 +8,35 @@ if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 export async function GET(request: Request) {
   try {
-    // 1. Obter sessão do barbeiro autenticado
-    const session = await getServerSession();
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
-    }
-
-    const barbershopId = (session.user as any).barbershopId;
-    if (!barbershopId) {
-      return NextResponse.json({ error: 'Sessão inválida' }, { status: 403 });
-    }
-
     const { searchParams } = new URL(request.url);
+    const slug = searchParams.get('slug');
     const date = searchParams.get('date');
     const status = searchParams.get('status');
+    const barberId = searchParams.get('barberId');
+
+    let targetBarbershopId = null;
+
+    if (slug) {
+      const shop = await prisma.barbershop.findUnique({ where: { slug } });
+      if (shop) targetBarbershopId = shop.id;
+    } else {
+      const session = await getServerSession();
+      if (session && session.user) {
+        targetBarbershopId = (session.user as any).barbershopId;
+      }
+    }
+
+    if (!targetBarbershopId) {
+      return NextResponse.json({ error: 'Sessão inválida ou barbearia não encontrada' }, { status: 403 });
+    }
 
     const whereClause: any = {
-      barbershopId: barbershopId
+      barbershopId: targetBarbershopId
     };
+
+    if (barberId) {
+      whereClause.barberId = barberId;
+    }
 
     if (date) {
       const startDate = new Date(date);

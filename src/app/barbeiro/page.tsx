@@ -11,16 +11,16 @@ import { useSession } from "next-auth/react";
 export default function AppDonoPage() {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('config');
+  const [activeTab, setActiveTab] = useState('agenda');
   const [selectedFilterDate, setSelectedFilterDate] = useState(new Date().toDateString());
+  const [filterBarberId, setFilterBarberId] = useState('all');
   
-  // Detecção de Mobile para Setup do WhatsApp
   const [isMobile, setIsMobile] = useState(false);
   const [usePairingCode, setUsePairingCode] = useState(false);
   const [phoneForPairing, setPhoneForPairing] = useState('');
   const [waQR, setWaQR] = useState<string | null>(null);
   const [waCode, setWaCode] = useState<string | null>(null);
-  const [waStatus, setWaStatus] = useState('loading'); // loading, pending, connected
+  const [waStatus, setWaStatus] = useState('loading');
   const [isLoaded, setIsLoaded] = useState(false);
 
   const [businessName, setBusinessName] = useState("");
@@ -31,6 +31,14 @@ export default function AppDonoPage() {
   const [domainOrigin, setDomainOrigin] = useState("");
 
   const { data: session, status } = useSession();
+
+  // State for Teams and Services
+  const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
+  const [team, setTeam] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>([]);
+  
+  const [newBarber, setNewBarber] = useState({ name: '', email: '', password: '' });
+  const [newService, setNewService] = useState({ name: '', price: '' });
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -59,7 +67,6 @@ export default function AppDonoPage() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
-    // Polling do WhatsApp Status (Microserviço)
     const checkWaStatus = async () => {
       try {
         const res = await fetch('http://localhost:3005/qr');
@@ -84,67 +91,124 @@ export default function AppDonoPage() {
 
   const handleRequestPairingCode = async () => {
     if (!phoneForPairing) return alert('Digite seu número de WhatsApp com o DDD (Ex: 11999999999)');
-    
     try {
       const res = await fetch('http://localhost:3005/pair', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: '55' + phoneForPairing.replace(/[^0-9]/g, '') }) // Forçando Brasil 55 para o MVP
+        body: JSON.stringify({ phone: '55' + phoneForPairing.replace(/[^0-9]/g, '') })
       });
       const data = await res.json();
       if (data.code) {
         setWaCode(data.code);
       } else {
-        alert('Erro ao gerar código. Certifique-se que o robô está rodando.');
+        alert('Erro ao gerar código.');
       }
     } catch (err) {
-      alert('Erro de conexão com o robô de WhatsApp.');
+      alert('Erro de conexão com o robô.');
     }
   };
 
-  // Modal de Equipe
-  const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
-  const [team, setTeam] = useState([
-    { id: 1, name: 'Carlos Eduardo (Dono)', hasPhoto: false },
-    { id: 2, name: 'Marcos Silva', hasPhoto: false },
-    { id: 3, name: 'Lucas Oliveira', hasPhoto: false }
-  ]);
+  const loadData = async () => {
+    try {
+      const [appRes, srvRes, barRes] = await Promise.all([
+        fetch('/api/appointments'),
+        fetch('/api/services'),
+        fetch('/api/barbers')
+      ]);
+      const appData = await appRes.json();
+      const srvData = await srvRes.json();
+      const barData = await barRes.json();
 
-  // Mock de Serviços (temporário até integrarmos o BD real)
-  const [services, setServices] = useState<any[]>([]);
+      if(Array.isArray(appData)) {
+        setAppointments(appData.map(app => ({
+          id: app.id,
+          time: new Date(app.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+          dateObj: new Date(app.date),
+          client: app.client?.name || 'Cliente',
+          service: app.service?.name || 'Serviço',
+          price: app.service?.price || 0,
+          status: app.status.toLowerCase(),
+          barberId: app.barberId
+        })));
+      }
+      if(Array.isArray(srvData)) setServices(srvData);
+      if(Array.isArray(barData)) setTeam(barData);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-  // Load real data
   useEffect(() => {
-    fetch('/api/appointments')
-      .then(res => res.json())
-      .then(data => {
-        if(Array.isArray(data)) {
-          const mapped = data.map(app => ({
-            id: app.id,
-            time: new Date(app.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-            dateObj: new Date(app.date),
-            client: app.client?.name || 'Cliente',
-            service: app.service?.name || 'Serviço',
-            price: app.service?.price || 0,
-            status: app.status.toLowerCase()
-          }));
-          setAppointments(mapped);
-        }
-      })
-      .catch(err => console.error(err));
-
-    fetch('/api/services')
-      .then(res => res.json())
-      .then(data => {
-        if(Array.isArray(data)) setServices(data);
-      })
-      .catch(err => console.error(err));
+    loadData();
   }, []);
 
-  // Configuração Visual de Horários
-  const [workingDays, setWorkingDays] = useState([false, true, true, true, true, true, true]); // Dom(0) a Sab(6)
-  const weekDayNames = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+  const handleComplete = async (id: string) => {
+    try {
+      await fetch(`/api/appointments/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'COMPLETED' })
+      });
+      setAppointments(prev => prev.map(app => app.id === id ? { ...app, status: 'completed' } : app));
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
+  const handleAddService = async () => {
+    if(!newService.name || !newService.price) return alert("Preencha nome e preço!");
+    try {
+      const res = await fetch('/api/services', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newService.name, price: newService.price })
+      });
+      if(res.ok) {
+        setNewService({name: '', price: ''});
+        loadData();
+      } else {
+        const data = await res.json();
+        alert(data.error || "Erro ao adicionar");
+      }
+    } catch(err) {
+      alert("Erro de conexão");
+    }
+  };
+
+  const handleDeleteService = async (id: string) => {
+    if(!confirm("Tem certeza que deseja remover este serviço?")) return;
+    await fetch(`/api/services?id=${id}`, { method: 'DELETE' });
+    loadData();
+  };
+
+  const handleAddBarber = async () => {
+    if(!newBarber.name || !newBarber.email || !newBarber.password) return alert("Preencha todos os campos!");
+    try {
+      const res = await fetch('/api/barbers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newBarber)
+      });
+      if(res.ok) {
+        setNewBarber({name: '', email: '', password: ''});
+        loadData();
+      } else {
+        const data = await res.json();
+        alert(data.error || "Erro ao adicionar");
+      }
+    } catch(err) {
+      alert("Erro de conexão");
+    }
+  };
+
+  const handleDeleteBarber = async (id: string) => {
+    if(!confirm("Tem certeza que deseja desativar este profissional? Ele não poderá mais logar nem receber novos agendamentos.")) return;
+    await fetch(`/api/barbers?id=${id}`, { method: 'DELETE' });
+    loadData();
+  };
+
+  const [workingDays, setWorkingDays] = useState([false, true, true, true, true, true, true]);
+  const weekDayNames = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
   const toggleDay = (index: number) => {
     const newDays = [...workingDays];
     newDays[index] = !newDays[index];
@@ -155,42 +219,26 @@ export default function AppDonoPage() {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
   };
 
-  const handleComplete = async (id: string) => {
-    try {
-      await fetch(`/api/appointments/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'COMPLETED' })
-      });
-      setAppointments(prev => 
-        prev.map(app => app.id === id ? { ...app, status: 'completed' } : app)
-      );
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const todayStr = new Date().toDateString();
   const currentMonthNum = new Date().getMonth();
 
-  // Faturamento apenas de HOJE
   const totalEarningsToday = appointments
     .filter(a => a.status === 'completed' && a.dateObj.toDateString() === todayStr)
     .reduce((acc, curr) => acc + curr.price, 0);
 
-  // Faturamento do MÊS
   const totalEarningsMonth = appointments
     .filter(a => a.status === 'completed' && a.dateObj.getMonth() === currentMonthNum)
     .reduce((acc, curr) => acc + curr.price, 0);
 
-  // Agendamentos baseados na data SELECIONADA no filtro (em vez de sempre HOJE)
-  const todaysAppointments = appointments.filter(a => a.dateObj.toDateString() === selectedFilterDate);
+  const todaysAppointments = appointments.filter(a => 
+    a.dateObj.toDateString() === selectedFilterDate &&
+    (filterBarberId === 'all' || a.barberId === filterBarberId)
+  );
 
   const generateDays = () => {
     const days = [];
     const date = new Date();
     const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-    
     for (let i = 0; i < 7; i++) {
       days.push({
         dayName: i === 0 ? 'Hoje' : dayNames[date.getDay()],
@@ -218,7 +266,6 @@ export default function AppDonoPage() {
 
   return (
     <div className={styles.container}>
-      {/* Menu Lateral (Drawer) - No PC será o Sidebar Esquerdo */}
       <div className={`${styles.drawerOverlay} ${isDrawerOpen ? styles.open : ''}`} onClick={() => setIsDrawerOpen(false)}></div>
       <div className={`${styles.drawer} ${isDrawerOpen ? styles.open : ''}`}>
         <div className={styles.drawerHeader}>
@@ -227,13 +274,13 @@ export default function AppDonoPage() {
           </div>
           <div>
             <div className={styles.drawerName}>{ownerName}</div>
-            <div className={styles.drawerRole}>Dono da Barbearia</div>
+            <div className={styles.drawerRole}>Profissional</div>
           </div>
         </div>
 
         <div className={styles.menuList}>
           <button className={`${styles.menuItem} ${activeTab === 'agenda' ? styles.active : ''}`} onClick={() => handleTabChange('agenda')}>
-            <Calendar size={20} /> Agenda de Hoje
+            <Calendar size={20} /> Agenda
           </button>
           <button className={`${styles.menuItem} ${activeTab === 'caixa' ? styles.active : ''}`} onClick={() => handleTabChange('caixa')}>
             <Wallet size={20} /> Meu Caixa
@@ -250,9 +297,7 @@ export default function AppDonoPage() {
         </div>
       </div>
 
-      {/* --- WRAPPER PRINCIPAL DO CONTEÚDO (No PC fica à direita do Sidebar) --- */}
       <div className={styles.mainWrapper}>
-        {/* Header com Hambúrguer (Mobile) */}
         <div className={styles.header}>
           <button className={styles.menuBtn} onClick={() => setIsDrawerOpen(true)}>
             <Menu size={28} />
@@ -262,16 +307,28 @@ export default function AppDonoPage() {
           </div>
         </div>
 
-        {/* Cartão de Faturamento Fixo no Topo */}
         <div className={styles.earningsCard}>
           <span className={styles.earningsTitle}>Faturamento de Hoje</span>
           <span className={styles.earningsValue}>{formatCurrency(totalEarningsToday)}</span>
         </div>
-
-        {/* --- CONTEÚDO DINÂMICO (Muda com base na Tab) --- */}
       
       {activeTab === 'agenda' && (
         <>
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ fontSize: '0.875rem', color: 'var(--theme-text-muted)', marginBottom: '0.5rem', display: 'block' }}>Filtrar por Profissional:</label>
+            <select 
+              value={filterBarberId} 
+              onChange={(e) => setFilterBarberId(e.target.value)}
+              className={styles.inputField}
+              style={{ backgroundColor: 'var(--theme-card)' }}
+            >
+              <option value="all">Todos os Profissionais</option>
+              {team.map(b => (
+                <option key={b.id} value={b.id}>{b.name}</option>
+              ))}
+            </select>
+          </div>
+
           <div className={styles.dateFilter}>
             {nextDays.map((d, i) => (
               <div 
@@ -287,13 +344,13 @@ export default function AppDonoPage() {
 
           <div className={styles.content}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h2 className={styles.sectionTitle} style={{ margin: 0 }}>Agenda de Hoje</h2>
+              <h2 className={styles.sectionTitle} style={{ margin: 0 }}>Agenda</h2>
             </div>
 
             <div className={styles.agendaList}>
               {todaysAppointments.length === 0 && (
                 <div style={{ textAlign: 'center', color: 'var(--theme-text-muted)', marginTop: '2rem' }}>
-                  Nenhum agendamento para hoje.
+                  Nenhum agendamento encontrado para o filtro atual.
                 </div>
               )}
               {todaysAppointments.map((app) => (
@@ -311,7 +368,7 @@ export default function AppDonoPage() {
                   <div className={styles.cardBody}>
                     <div>
                       <div className={styles.clientName}>{app.client}</div>
-                      <div className={styles.serviceInfo}>{app.service}</div>
+                      <div className={styles.serviceInfo}>{app.service} <span style={{ opacity: 0.5 }}>• {team.find(b=>b.id === app.barberId)?.name}</span></div>
                     </div>
                     <div className={styles.priceInfo}>
                       {formatCurrency(app.price)}
@@ -338,12 +395,29 @@ export default function AppDonoPage() {
         <div className={styles.content}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <h2 className={styles.sectionTitle} style={{ marginBottom: 0 }}>Meus Serviços</h2>
-            <button 
-              style={{ background: 'var(--theme-accent)', color: '#000', border: 'none', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer' }}
-              onClick={() => alert("Adicionar novo serviço!")}
-            >
-              + NOVO
-            </button>
+          </div>
+
+          {/* Form Novo Serviço */}
+          <div style={{ backgroundColor: 'var(--theme-card)', padding: '1.5rem', borderRadius: '12px', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <h3 style={{ fontSize: '1rem', marginBottom: '1rem' }}>Cadastrar Novo Serviço</h3>
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+              <input 
+                className={styles.inputField} 
+                placeholder="Ex: Degradê Navalhado"
+                value={newService.name}
+                onChange={e => setNewService({...newService, name: e.target.value})}
+                style={{ flex: 2 }}
+              />
+              <input 
+                className={styles.inputField} 
+                type="number"
+                placeholder="Valor (R$)"
+                value={newService.price}
+                onChange={e => setNewService({...newService, price: e.target.value})}
+                style={{ flex: 1 }}
+              />
+            </div>
+            <button className={styles.primaryButton} onClick={handleAddService}>Salvar Serviço</button>
           </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', paddingBottom: '2rem' }}>
@@ -352,26 +426,17 @@ export default function AppDonoPage() {
                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                   <div style={{ flex: 2, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <label style={{ fontSize: '0.75rem', color: 'var(--theme-text-muted)' }}>Nome do Serviço</label>
-                    <input 
-                      className={styles.inputField} 
-                      defaultValue={service.name} 
-                      style={{ fontWeight: 600, fontSize: '1rem', padding: '0.75rem' }}
-                    />
+                    <div style={{ fontWeight: 600, fontSize: '1rem' }}>{service.name}</div>
                   </div>
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <label style={{ fontSize: '0.75rem', color: 'var(--theme-text-muted)' }}>Preço (R$)</label>
-                    <input 
-                      className={styles.inputField} 
-                      defaultValue={service.price} 
-                      type="number"
-                      style={{ fontWeight: 600, fontSize: '1rem', padding: '0.75rem', textAlign: 'center' }}
-                    />
+                    <div style={{ fontWeight: 600, fontSize: '1rem' }}>{formatCurrency(service.price)}</div>
                   </div>
                 </div>
                 
                 <button 
                   style={{ background: 'none', border: 'none', color: '#ef4444', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', padding: '0.5rem' }}
-                  onClick={() => alert(`Remover ${service.name}?`)}
+                  onClick={() => handleDeleteService(service.id)}
                 >
                   <Trash2 size={16} /> Remover Serviço
                 </button>
@@ -385,12 +450,10 @@ export default function AppDonoPage() {
         <div className={styles.content}>
           <h2 className={styles.sectionTitle}>Configurações da Barbearia</h2>
 
-          {/* Setup de WhatsApp - Self Service */}
           <div className={styles.inputGroup} style={{ marginBottom: '2rem', padding: '1.5rem', backgroundColor: 'var(--theme-card)', borderRadius: '12px', border: '1px solid var(--theme-accent)' }}>
             <h3 style={{ fontSize: '1.125rem', marginBottom: '0.5rem', color: '#25D366', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Settings size={20} /> Conectar WhatsApp (Robô)
             </h3>
-            
             {waStatus === 'connected' ? (
               <div style={{ backgroundColor: 'rgba(37, 211, 102, 0.1)', padding: '1.5rem', borderRadius: '8px', border: '1px solid #25D366', textAlign: 'center' }}>
                 <CheckCircle2 size={48} color="#25D366" style={{ marginBottom: '1rem' }} />
@@ -399,12 +462,11 @@ export default function AppDonoPage() {
               </div>
             ) : waStatus === 'error' ? (
               <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', padding: '1.5rem', borderRadius: '8px', border: '1px dashed #ef4444', textAlign: 'center' }}>
-                <p style={{ color: '#ef4444' }}>⚠️ Microserviço do WhatsApp offline. Verifique se o servidor na porta 3005 está rodando.</p>
+                <p style={{ color: '#ef4444' }}>⚠️ Microserviço do WhatsApp offline.</p>
               </div>
             ) : (
               <>
                 {usePairingCode ? (
-                  // VISÃO MOBILE (CÓDIGO DE PAREAMENTO)
                   <>
                     <p style={{ color: 'var(--theme-text-muted)', fontSize: '0.875rem', marginBottom: '1rem', lineHeight: 1.4 }}>
                       Como você está no celular, use o <strong>Código de Conexão</strong>:<br/><br/>
@@ -413,7 +475,6 @@ export default function AppDonoPage() {
                       3. Toque em "Conectar com número de telefone"<br/>
                       4. Digite o código de 8 dígitos que aparecerá
                     </p>
-                    
                     {!waCode ? (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
                         <input 
@@ -437,7 +498,6 @@ export default function AppDonoPage() {
                         <p style={{ color: 'var(--theme-text-muted)', fontSize: '0.75rem', marginTop: '0.5rem' }}>Aguardando você digitar o código no WhatsApp...</p>
                       </div>
                     )}
-                    
                     <button 
                       style={{ background: 'none', border: 'none', color: 'var(--theme-text-muted)', fontSize: '0.75rem', textDecoration: 'underline', marginBottom: '0', cursor: 'pointer', width: '100%' }}
                       onClick={() => setUsePairingCode(false)}
@@ -446,7 +506,6 @@ export default function AppDonoPage() {
                     </button>
                   </>
                 ) : (
-                  // VISÃO PC (QR CODE)
                   <>
                     <p style={{ color: 'var(--theme-text-muted)', fontSize: '0.875rem', marginBottom: '1rem', lineHeight: 1.4 }}>
                       1. Abra o WhatsApp no celular da barbearia<br/>
@@ -477,7 +536,7 @@ export default function AppDonoPage() {
               <Share2 size={20} /> Divulgar Aplicativo
             </h3>
             <p style={{ color: 'var(--theme-text-muted)', fontSize: '0.875rem', marginBottom: '1rem', lineHeight: 1.4 }}>
-              Envie este link no WhatsApp dos seus clientes ou coloque na bio do Instagram para eles agendarem sozinhos!
+              Envie este link no WhatsApp dos seus clientes!
             </p>
             <button 
               className={styles.primaryButton}
@@ -493,76 +552,13 @@ export default function AppDonoPage() {
           </div>
           
           <div className={styles.inputGroup}>
-            <label className={styles.inputLabel}>Nome do Estabelecimento</label>
-            <input className={styles.inputField} value={businessName} onChange={(e) => setBusinessName(e.target.value)} />
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label className={styles.inputLabel}>WhatsApp (Contato)</label>
-            <input className={styles.inputField} type="tel" value={ownerPhone} onChange={(e) => setOwnerPhone(e.target.value)} placeholder="Aparecerá no app do cliente" />
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label className={styles.inputLabel}>Endereço (Localização)</label>
-            <input className={styles.inputField} defaultValue="Av. Paulista, 1000 - SP" placeholder="Aparecerá no app do cliente" />
-          </div>
-
-          <div className={styles.inputGroup} style={{ marginBottom: '1.5rem', alignItems: 'center' }}>
-            <label className={styles.inputLabel} style={{ width: '100%', textAlign: 'center', marginBottom: '1rem' }}>Foto do Salão</label>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-              <div 
-                style={{ width: 100, height: 100, borderRadius: '50%', backgroundColor: 'var(--theme-card)', border: '2px solid var(--theme-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-                onClick={() => alert("Abrir galeria do celular...")}
-              >
-                <Camera size={32} color="var(--theme-text-muted)" />
-              </div>
-              <span style={{ color: 'var(--theme-accent)', fontWeight: 600, fontSize: '0.875rem' }}>Alterar Foto</span>
-            </div>
-          </div>
-
-          <div className={styles.inputGroup} style={{ marginBottom: '2rem' }}>
-            <label className={styles.inputLabel}>Dias de Funcionamento</label>
-            <div className={styles.workingDaysGrid}>
-              {weekDayNames.map((day, idx) => (
-                <button 
-                  key={idx}
-                  className={`${styles.workingDayBtn} ${workingDays[idx] ? styles.active : ''}`}
-                  onClick={() => toggleDay(idx)}
-                >
-                  {day}
-                </button>
-              ))}
-            </div>
-            
-            <div style={{ marginTop: '1.25rem' }}>
-              <label className={styles.inputLabel}>Horário Comercial</label>
-              <div className={styles.timeRow}>
-                <span>Das</span>
-                <input type="time" className={styles.timeInput} defaultValue="09:00" />
-                <span>até</span>
-                <input type="time" className={styles.timeInput} defaultValue="19:00" />
-              </div>
-            </div>
-
-            <div style={{ marginTop: '1.25rem' }}>
-              <label className={styles.inputLabel}>Pausa para o Almoço (Agenda Fechada)</label>
-              <div className={styles.timeRow}>
-                <span>Das</span>
-                <input type="time" className={styles.timeInput} defaultValue="12:00" />
-                <span>até</span>
-                <input type="time" className={styles.timeInput} defaultValue="13:00" />
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.inputGroup}>
             <label className={styles.inputLabel}>Gerenciar Equipe</label>
             <button 
               className={styles.actionButton} 
               style={{ backgroundColor: 'var(--theme-card)', color: 'var(--theme-accent)', border: '1px solid var(--theme-accent)' }}
               onClick={() => setIsTeamModalOpen(true)}
             >
-              <Scissors size={20} /> Ver Barbeiros ({team.length})
+              <Scissors size={20} /> Ver Profissionais Cadastrados ({team.length})
             </button>
           </div>
 
@@ -619,16 +615,9 @@ export default function AppDonoPage() {
       {activeTab === 'perfil' && (
         <div className={styles.content}>
           <h2 className={styles.sectionTitle}>Meu Perfil</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-            <div style={{ width: 100, height: 100, borderRadius: '50%', backgroundColor: 'var(--theme-card)', border: '2px solid var(--theme-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Camera size={32} color="var(--theme-text-muted)" />
-            </div>
-            <span style={{ color: 'var(--theme-accent)', fontWeight: 600, fontSize: '0.875rem' }}>Alterar Foto</span>
-          </div>
-
           <div className={styles.inputGroup}>
             <label className={styles.inputLabel}>Seu Nome</label>
-            <input className={styles.inputField} value={ownerName} onChange={(e) => setOwnerName(e.target.value)} />
+            <input className={styles.inputField} value={ownerName} onChange={(e) => setOwnerName(e.target.value)} disabled />
           </div>
         </div>
       )}
@@ -637,52 +626,49 @@ export default function AppDonoPage() {
       {isTeamModalOpen && (
         <>
           <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 100 }} onClick={() => setIsTeamModalOpen(false)} />
-          <div style={{ position: 'fixed', top: '10%', left: '5%', right: '5%', bottom: '10%', backgroundColor: 'var(--theme-bg)', zIndex: 101, borderRadius: '16px', padding: '1.5rem', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <div style={{ position: 'fixed', top: '5%', left: '5%', right: '5%', bottom: '5%', backgroundColor: 'var(--theme-bg)', zIndex: 101, borderRadius: '16px', padding: '1.5rem', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>Sua Equipe</h2>
               <button onClick={() => setIsTeamModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--theme-text-muted)', cursor: 'pointer' }}>
-                <span style={{ fontSize: '1.5rem' }}>×</span>
+                <span style={{ fontSize: '2rem' }}>×</span>
               </button>
             </div>
 
-            <button 
-              className={styles.primaryButton}
-              style={{ width: '100%', marginBottom: '1.5rem', padding: '0.75rem', borderRadius: '8px' }}
-              onClick={() => alert("Abrir formulário de cadastro de barbeiro...")}
-            >
-              + Adicionar Novo Barbeiro
-            </button>
+            <div style={{ backgroundColor: 'var(--theme-card)', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <h3 style={{ fontSize: '1rem', marginBottom: '1rem' }}>Cadastrar Profissional</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <input 
+                  className={styles.inputField} placeholder="Nome do Barbeiro" 
+                  value={newBarber.name} onChange={e => setNewBarber({...newBarber, name: e.target.value})}
+                />
+                <input 
+                  className={styles.inputField} placeholder="Email (para Login)" type="email"
+                  value={newBarber.email} onChange={e => setNewBarber({...newBarber, email: e.target.value})}
+                />
+                <input 
+                  className={styles.inputField} placeholder="Senha provisória" type="text"
+                  value={newBarber.password} onChange={e => setNewBarber({...newBarber, password: e.target.value})}
+                />
+                <button className={styles.primaryButton} style={{ marginTop: '0.5rem' }} onClick={handleAddBarber}>
+                  Salvar Profissional
+                </button>
+              </div>
+            </div>
 
             <div style={{ overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem', paddingBottom: '1rem' }}>
               {team.map(member => (
-                <div key={member.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: 'var(--theme-card)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.1)' }}>
-                  
-                  {/* Foto Idêntica ao resto do app */}
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                    <div 
-                      style={{ width: 100, height: 100, borderRadius: '50%', backgroundColor: 'var(--theme-bg)', border: '2px solid var(--theme-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-                      onClick={() => alert(`Escolher foto para ${member.name}...`)}
-                    >
-                      <Camera size={32} color="var(--theme-text-muted)" />
-                    </div>
-                    <span style={{ color: 'var(--theme-accent)', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer' }}>Adicionar Foto</span>
-                  </div>
-                  
-                  <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    <input 
-                      className={styles.inputField} 
-                      defaultValue={member.name} 
-                      style={{ textAlign: 'center', fontWeight: 700, fontSize: '1rem', padding: '0.75rem' }}
-                    />
+                <div key={member.id} style={{ display: 'flex', flexDirection: 'column', backgroundColor: 'var(--theme-card)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.1)' }}>
+                  <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{member.name}</div>
+                    <div style={{ color: 'var(--theme-text-muted)', fontSize: '0.875rem' }}>Login: {member.email}</div>
                     <button 
-                      style={{ background: 'none', border: 'none', color: '#ef4444', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem', padding: '0.5rem' }}
-                      onClick={() => alert(`Remover ${member.name}?`)}
+                      style={{ background: 'none', border: 'none', color: '#ef4444', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', padding: '0.5rem 0', marginTop: '0.5rem' }}
+                      onClick={() => handleDeleteBarber(member.id)}
                     >
-                      <Trash2 size={16} /> Remover Barbeiro
+                      <Trash2 size={16} /> Desativar Barbeiro
                     </button>
                   </div>
-
                 </div>
               ))}
             </div>
@@ -691,7 +677,7 @@ export default function AppDonoPage() {
         </>
       )}
 
-      </div> {/* Fechamento do mainWrapper */}
+      </div>
     </div>
   );
 }

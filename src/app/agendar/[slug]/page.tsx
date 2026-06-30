@@ -7,12 +7,6 @@ import {
   Scissors, User, CheckCircle2, Phone, ChevronLeft, ChevronRight, X, Sun, Moon, Camera, Key
 } from 'lucide-react';
 
-const mockBarbers = [
-  { id: '1', name: 'Carlos Eduardo' },
-  { id: '2', name: 'Marcos Silva' },
-  { id: '3', name: 'Rafael Costa' },
-];
-
 const MustacheIcon = ({ size, color, style, ...props }: any) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill={color || "currentColor"} style={style} {...props}>
     <path d="M2.38 12.5C3.36 10.87 5.76 9.4 8.5 9.4C10.5 9.4 12 10.6 12 11.8C12 10.6 13.5 9.4 15.5 9.4C18.24 9.4 20.64 10.87 21.62 12.5C21.75 12.7 21.57 12.93 21.35 12.87C19 12.2 16.5 12.9 15.5 14C15.3 14.2 15 14.2 14.8 14C13.5 12.5 12.5 12.5 12 12.5C11.5 12.5 10.5 12.5 9.2 14C9 14.2 8.7 14.2 8.5 14C7.5 12.9 5 12.2 2.65 12.87C2.43 12.93 2.25 12.7 2.38 12.5Z" />
@@ -26,40 +20,18 @@ const ComboIcon = ({ size, ...props }: any) => (
   </div>
 );
 
-const mockServices = [
-  { id: '1', name: 'Corte Degradê', icon: Scissors, price: 45 },
-  { id: '2', name: 'Social', icon: Scissors, price: 40 },
-  { id: '3', name: 'Corte e Barba', icon: ComboIcon, price: 75 },
-  { id: '4', name: 'Barba', icon: MustacheIcon, price: 35 },
-];
-
 const mockTimes = ['09:00', '09:40', '10:20', '11:00', '11:40', '13:00', '13:40', '14:20', '15:00', '15:40', '16:20', '17:00', '17:40', '18:20', '19:00', '19:40'];
 
 export default function AgendamentoPage({ params }: { params: Promise<{ slug: string }> }) {
-  const [barbers, setBarbers] = useState<any[]>(mockBarbers);
-  const [services, setServices] = useState<any[]>(mockServices);
-
-  useEffect(() => {
-    // We'll fetch barbers when we fetch the barbershop by slug
-    fetch('/api/services').then(r => r.json()).then(data => {
-      const withIcons = data.map((s: any) => ({
-        ...s,
-        icon: s.name.toLowerCase().includes('barba') && s.name.toLowerCase().includes('corte') ? ComboIcon : (s.name.toLowerCase().includes('barba') ? MustacheIcon : Scissors)
-      }));
-      setServices(withIcons);
-    }).catch(() => {
-      // Falta o endpoint /api/services, mantém mock
-    });
-  }, []);
+  const [barbers, setBarbers] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>([]);
 
   const [selectedBarber, setSelectedBarber] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(new Date().toISOString().split('T')[0]);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [bookedTimes, setBookedTimes] = useState<string[]>([]);
   
-  // Custom Calendar State
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authData, setAuthData] = useState({ username: '', password: '', whatsapp: '' });
   const [isSuccess, setIsSuccess] = useState(false);
@@ -77,19 +49,51 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
         .then(data => {
           if (data.error) {
             setBusinessName("Barbearia não encontrada");
-            setBarbers([]);
           } else {
             setBusinessName(data.name);
-            setBarbers(data.barbers || []);
           }
         })
         .catch(() => {
           setBusinessName("Erro ao carregar");
         });
+
+      fetch(`/api/barbers?slug=${p.slug}`)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) setBarbers(data);
+        });
+
+      fetch(`/api/services?slug=${p.slug}`)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            const withIcons = data.map((s: any) => ({
+              ...s,
+              icon: s.name.toLowerCase().includes('barba') && s.name.toLowerCase().includes('corte') ? ComboIcon : (s.name.toLowerCase().includes('barba') ? MustacheIcon : Scissors)
+            }));
+            setServices(withIcons);
+          }
+        });
     });
   }, [params]);
+
+  useEffect(() => {
+    if (selectedBarber && selectedDate && slugStr) {
+      setBookedTimes([]); // Clear while loading
+      fetch(`/api/appointments?slug=${slugStr}&date=${selectedDate}&barberId=${selectedBarber}`)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            const booked = data.map(app => {
+              const d = new Date(app.date);
+              return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            });
+            setBookedTimes(booked);
+          }
+        });
+    }
+  }, [selectedBarber, selectedDate, slugStr]);
   
-  // Tabs: 'agendar' | 'perfil' | 'config'
   const [clientTab, setClientTab] = useState('agendar');
 
   const BackgroundPattern = () => (
@@ -148,8 +152,6 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
     }
   };
 
-  // Funções do Calendário Horizontal (Estilo App do Barbeiro)
-  // Simulação: Barbeiro trabalha de Segunda a Sábado (Dom=0 é falso)
   const workingDays = [false, true, true, true, true, true, true]; 
 
   const generateAvailableDays = () => {
@@ -157,7 +159,6 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
     const date = new Date();
     const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
     
-    // Gerar os próximos 15 dias válidos (pulando os dias que ele não trabalha)
     let added = 0;
     while (added < 15) {
       if (workingDays[date.getDay()]) {
@@ -180,7 +181,6 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
 
   const nextDays = generateAvailableDays();
 
-  // Se o selectedDate não for um dia válido inicial, pegamos o primeiro da lista
   React.useEffect(() => {
     if (nextDays.length > 0 && !nextDays.find(d => d.fullDate === selectedDate)) {
       setSelectedDate(nextDays[0].fullDate);
@@ -189,7 +189,7 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
 
   const handleDateSelect = (dateString: string) => {
     setSelectedDate(dateString);
-    setSelectedTime(null); // Reseta o horário ao trocar o dia
+    setSelectedTime(null);
   };
 
   if (isSuccess) {
@@ -250,9 +250,7 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
               </div>
             </div>
 
-        {/* Referência aos dados configurados pelo dono */}
         <div className={styles.socialRow}>
-          {/* Se configurou o WhatsApp, o botão aparece */}
           <a 
             href="https://wa.me/5511999999999"
             target="_blank"
@@ -264,8 +262,6 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
               <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
             </svg>
           </a>
-
-          {/* Se configurou o Endereço, o botão aparece */}
           <a 
             href="https://maps.google.com/?q=Av.+Paulista,+1000+-+SP"
             target="_blank"
@@ -281,15 +277,15 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
         <div className={styles.shopSubtitle}>Barbearia Premium</div>
       </div>
 
-      {/* Bloco 1: Barbeiro */}
       <div className={styles.contentBlock}>
         <h2 className={styles.blockTitle}>Escolha o Profissional</h2>
+        {barbers.length === 0 && <div style={{color:'var(--theme-text-muted)'}}>Nenhum profissional cadastrado.</div>}
         <div className={styles.barberScroll}>
           {barbers.map(barber => (
             <div 
               key={barber.id}
               className={`${styles.barberCard} ${selectedBarber === barber.id ? styles.barberCardSelected : ''}`}
-              onClick={() => setSelectedBarber(barber.id)}
+              onClick={() => { setSelectedBarber(barber.id); setSelectedTime(null); }}
             >
               <div className={styles.barberAvatar}>
                 <User size={24} color={selectedBarber === barber.id ? '#000' : 'var(--theme-text-muted)'} />
@@ -300,12 +296,12 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
         </div>
       </div>
 
-      {/* Bloco 2: Serviço */}
       <div className={styles.contentBlock}>
         <h2 className={styles.blockTitle}>Escolha o Serviço</h2>
+        {services.length === 0 && <div style={{color:'var(--theme-text-muted)'}}>Nenhum serviço cadastrado.</div>}
         <div className={styles.serviceGrid}>
           {services.map((service) => {
-            const Icon = service.icon;
+            const Icon = service.icon || Scissors;
             return (
               <div 
                 key={service.id} 
@@ -323,11 +319,9 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
         </div>
       </div>
 
-      {/* Bloco 3: Data e Hora */}
       <div className={styles.contentBlock}>
         <h2 className={styles.blockTitle}>Escolha a Data e o Horário</h2>
         
-        {/* Filtro de Datas Horizontal */}
         <div className={styles.dateFilter}>
           {nextDays.map((d, i) => (
             <div 
@@ -341,24 +335,29 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
           ))}
         </div>
 
-        <div className={styles.timeGrid}>
-          {mockTimes.map((time, idx) => {
-            const disabled = idx === 2 || idx === 5;
-            return (
-              <div 
-                key={time}
-                className={`${styles.timeSlot} ${selectedTime === time ? styles.timeSlotSelected : ''}`}
-                style={{ opacity: disabled ? 0.3 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
-                onClick={() => !disabled && setSelectedTime(time)}
-              >
-                {time}
-              </div>
-            )
-          })}
-        </div>
+        {selectedBarber ? (
+          <div className={styles.timeGrid}>
+            {mockTimes.map((time) => {
+              const disabled = bookedTimes.includes(time);
+              return (
+                <div 
+                  key={time}
+                  className={`${styles.timeSlot} ${selectedTime === time ? styles.timeSlotSelected : ''}`}
+                  style={{ opacity: disabled ? 0.3 : 1, cursor: disabled ? 'not-allowed' : 'pointer', background: disabled ? 'var(--theme-card)' : '' }}
+                  onClick={() => !disabled && setSelectedTime(time)}
+                >
+                  {time}
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <div style={{ textAlign: 'center', color: 'var(--theme-text-muted)', padding: '2rem 0' }}>
+            Selecione um profissional primeiro para ver os horários.
+          </div>
+        )}
       </div>
 
-          {/* Botão Fixo Inferior */}
           <div className={styles.footerActions}>
             <button 
               className={styles.primaryButton} 
@@ -417,7 +416,6 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
         </div>
       )}
 
-      {/* Modal de Cadastro (Usuário e Senha) */}
       {isAuthModalOpen && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
@@ -468,7 +466,6 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
         </div>
       )}
 
-      {/* Drawer do Cliente */}
       {isMenuOpen && (
         <>
           <div className={styles.drawerOverlay} onClick={() => setIsMenuOpen(false)} />

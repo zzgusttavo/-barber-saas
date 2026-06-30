@@ -100,4 +100,10 @@ const usePostgresAuthState = async (sessionId) => {
     };
 };
 
-module.exports = { usePostgresAuthState };
+const clearPostgresAuthState = async (sessionId) => {
+    await prisma.whatsAppSession.deleteMany({
+        where: { sessionId }
+    });
+};
+
+module.exports = { usePostgresAuthState, clearPostgresAuthState };

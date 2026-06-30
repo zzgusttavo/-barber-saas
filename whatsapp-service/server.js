@@ -3,7 +3,7 @@ const cors = require('cors');
 const qrcode = require('qrcode');
 const pino = require('pino');
 const { default: makeWASocket, DisconnectReason } = require('@whiskeysockets/baileys');
-const { usePostgresAuthState } = require('./usePostgresAuthState');
+const { usePostgresAuthState, clearPostgresAuthState } = require('./usePostgresAuthState');
 const path = require('path');
 const fs = require('fs');
 
@@ -44,8 +44,8 @@ async function connectToWhatsApp() {
             if (shouldReconnect) {
                 connectToWhatsApp();
             } else {
-                console.log('[WHATSAPP] Desconectado. Apagando sessão...');
-                fs.rmSync(authFolder, { recursive: true, force: true });
+                console.log('[WHATSAPP] Desconectado. Apagando sessão do Postgres...');
+                await clearPostgresAuthState('default');
                 currentQR = null;
                 connectToWhatsApp();
             }
