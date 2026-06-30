@@ -45,7 +45,7 @@ export default function OnboardingPage() {
       setDirection(1);
       setCurrentStep((prev) => prev + 1);
     } else {
-      router.push("/dashboard");
+      router.push("/barbeiro");
     }
   };
 
