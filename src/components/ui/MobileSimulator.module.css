@@ -1,0 +1,68 @@
+.simulatorWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #0f111a; /* Fundo escuro atrás do celular */
+  padding: 2rem;
+}
+
+.phoneBezel {
+  width: 390px; /* Largura padrão iPhone */
+  height: 844px; /* Altura padrão iPhone */
+  background-color: #000;
+  border-radius: 48px;
+  box-shadow: 0 0 0 10px #1f2232, 0 20px 40px rgba(0,0,0,0.5);
+  position: relative;
+  overflow: hidden;
+  border: 4px solid #333;
+}
+
+/* O "Notch" do iPhone (Dynamic Island) */
+.notch {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 32px;
+  background-color: #000;
+  border-radius: 20px;
+  z-index: 100;
+}
+
+.screen {
+  width: 100%;
+  height: 100%;
+  background-color: #1e202c; /* Fundo do app */
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Esconde scrollbar nativa dentro do mock */
+  scrollbar-width: none;
+}
+
+.screen::-webkit-scrollbar {
+  display: none;
+}
+
+/* Se a tela já for pequena (acessando direto do celular), 
+   tira o visual de mockup e exibe tela cheia normal */
+@media (max-width: 768px) {
+  .simulatorWrapper {
+    padding: 0;
+    min-height: auto;
+    background-color: transparent;
+  }
+  
+  .phoneBezel {
+    width: 100%;
+    height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+  }
+  
+  .notch {
+    display: none;
+  }
+}

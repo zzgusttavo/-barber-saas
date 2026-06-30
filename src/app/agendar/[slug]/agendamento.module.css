@@ -1,0 +1,429 @@
+/* Tema Escuro Fechado - Exclusivo para a Tela do Cliente */
+.container {
+  --theme-bg: #000000;
+  --theme-card: #111111;
+  --theme-accent: #ffb800; /* Dourado */
+  --theme-text-main: #ffffff;
+  --theme-text-muted: #9ca3af;
+  
+  min-height: 100vh;
+  background-color: var(--theme-bg);
+  color: var(--theme-text-main);
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  padding-bottom: 8rem; /* Espaço para o botão flutuante */
+}
+
+/* --- TEMA CLARO --- */
+.lightTheme {
+  --theme-bg: #f8fafc;
+  --theme-card: #ffffff;
+  --theme-text-main: #0f172a;
+  --theme-text-muted: #64748b;
+  /* O dourado (--theme-accent) permanece o mesmo para manter a identidade */
+}
+
+/* --- Header Superior --- */
+.topNav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+}
+
+.topIcon {
+  color: var(--theme-accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.topIconGroup {
+  display: flex;
+  gap: 1rem;
+}
+
+/* --- Seção de Perfil (Logo apenas) --- */
+.heroSection {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  padding-top: 6rem; /* Espaço para o header absoluto */
+}
+
+.logoWrapper {
+  width: 100px;
+  height: 100px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.socialRow {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.socialBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background-color: var(--theme-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--theme-text-main);
+  border: none;
+  cursor: pointer;
+}
+
+.shopName {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 1.5rem 0 2rem;
+  letter-spacing: -0.02em;
+}
+
+/* --- Blocos da Página Unificada --- */
+.contentBlock {
+  padding: 0 1.25rem;
+  margin-bottom: 3rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.blockTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  color: var(--theme-text-main);
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+
+/* --- Barbeiros (Horizontal Scroll) --- */
+.barberScroll {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  /* Esconde a scrollbar na maioria dos navegadores */
+  scrollbar-width: none; 
+}
+.barberScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.barberCard {
+  min-width: 120px;
+  background-color: var(--theme-card);
+  border-radius: 12px;
+  padding: 1.25rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid rgba(255, 184, 0, 0.25);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.barberCardSelected {
+  border-color: var(--theme-accent);
+  background-color: rgba(255, 184, 0, 0.05);
+}
+
+.barberAvatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #1e202c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.barberCardSelected .barberAvatar {
+  background-color: var(--theme-accent);
+  color: #000;
+}
+
+.barberName {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* --- Grid de Serviços --- */
+.serviceGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.serviceCard {
+  background-color: var(--theme-card);
+  border-radius: 12px;
+  padding: 2rem 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  border: 1px solid rgba(255, 184, 0, 0.25);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.serviceCardSelected {
+  border-color: var(--theme-accent);
+  background-color: rgba(255, 184, 0, 0.05);
+}
+
+.serviceIconWrapper {
+  color: var(--theme-accent);
+}
+
+.serviceName {
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* --- Filtro de Datas (Carrossel Horizontal) --- */
+.dateFilter {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 0.5rem;
+  margin-top: 0.5rem;
+}
+.dateFilter::-webkit-scrollbar { display: none; }
+
+.datePill {
+  min-width: 75px;
+  padding: 1rem 0.5rem;
+  border-radius: 16px;
+  background-color: var(--theme-card);
+  border: 1px solid rgba(255, 184, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.datePillSelected {
+  background-color: var(--theme-accent);
+  color: #000;
+  border-color: var(--theme-accent);
+}
+
+.dateDayName { font-size: 0.8125rem; opacity: 0.7; font-weight: 600; }
+.dateNumber { font-size: 1.5rem; font-weight: 700; margin-top: 0.25rem; }
+
+/* --- Horários --- */
+.timeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.timeSlot {
+  background-color: var(--theme-card);
+  padding: 1rem 0;
+  text-align: center;
+  border-radius: 8px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 184, 0, 0.25);
+}
+
+.timeSlotSelected {
+  background-color: var(--theme-accent);
+  color: #000;
+}
+
+.inputField {
+  background-color: var(--theme-card);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--theme-text-main);
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.inputField:focus {
+  outline: none;
+  border-color: var(--theme-accent);
+}
+
+/* --- Footer Fixo --- */
+.footerActions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1.25rem;
+  background: var(--theme-bg);
+  display: flex;
+  justify-content: center;
+  z-index: 30;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.primaryButton {
+  background-color: var(--theme-accent);
+  color: #000000;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 1rem 2rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 12px rgba(255, 184, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.primaryButton:disabled {
+  opacity: 0.4;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* --- Auth Modal (Cadastro/Login) --- */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+}
+
+.modalContent {
+  background-color: var(--theme-bg);
+  width: 100%;
+  border-radius: 24px 24px 0 0;
+  padding: 2rem 1.5rem 3rem;
+  animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* --- Drawer (Menu Lateral do Cliente) --- */
+.drawerOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.7);
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 80%;
+  max-width: 320px;
+  height: 100vh;
+  background-color: var(--theme-bg);
+  z-index: 1001;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+  animation: slideRight 0.3s ease forwards;
+}
+
+@keyframes slideRight {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.drawerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.drawerMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.drawerItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background: none;
+  border: none;
+  color: var(--theme-text-main);
+  font-size: 1rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.drawerItem:hover {
+  background-color: var(--theme-card);
+}
+
+.drawerItemIcon {
+  color: var(--theme-accent);
+}
+
+/* --- Animations --- */
+.successIconAnim {
+  animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.successTextAnim {
+  animation: fadeUp 0.6s ease forwards;
+  animation-delay: 0.2s;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes fadeUp {
+  to { transform: translateY(0); opacity: 1; }
+}

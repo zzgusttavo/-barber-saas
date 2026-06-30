@@ -1,0 +1,51 @@
+.card {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color); /* Bordas muito sutis */
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: box-shadow var(--transition-normal), transform var(--transition-normal);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px); /* Efeito flutuante de alto padrão */
+}
+
+.header {
+  padding: 2rem 2rem 0; /* Mais respiro (padding) */
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+  letter-spacing: -0.02em;
+}
+
+.description {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+.content {
+  padding: 2rem; /* Espaçamento generoso = luxo */
+}
+
+.footer {
+  padding: 1.5rem 2rem;
+  background-color: var(--bg-primary); /* Fim dos fundos cinzas no rodapé */
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.glass {
+  background: var(--bg-panel);
+  backdrop-filter: blur(24px); /* Blur mais intenso */
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}

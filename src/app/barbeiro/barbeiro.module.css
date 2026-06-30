@@ -1,0 +1,468 @@
+.container {
+  --theme-bg: #000000;
+  --theme-card: #111111;
+  --theme-accent: #ffb800;
+  --theme-text-main: #ffffff;
+  --theme-text-muted: #9ca3af;
+  --theme-success: #10b981;
+  
+  min-height: 100vh;
+  background-color: var(--theme-bg);
+  color: var(--theme-text-main);
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* --- Header e Receita --- */
+.header {
+  padding: 1.5rem 1.25rem;
+  background-color: var(--theme-bg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.menuBtn {
+  background: none;
+  border: none;
+  color: var(--theme-text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.earningsCard {
+  margin: 0 1.25rem 1.5rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, var(--theme-accent) 0%, #d99a00 100%);
+  border-radius: 20px;
+  color: #000;
+  box-shadow: 0 8px 24px rgba(255, 184, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.earningsTitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.earningsValue {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* --- Gaveta (Drawer Lateral) --- */
+.drawerOverlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0,0,0,0.6);
+  z-index: 40;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.drawerOverlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drawer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  background-color: var(--theme-card);
+  z-index: 50;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.25rem;
+  box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+}
+
+.drawer.open {
+  transform: translateX(0);
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.drawerAvatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: var(--theme-bg);
+  color: var(--theme-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--theme-accent);
+}
+
+.drawerName {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.drawerRole {
+  font-size: 0.875rem;
+  color: var(--theme-text-muted);
+}
+
+.menuList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  color: var(--theme-text-main);
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s;
+}
+
+.menuItem.active {
+  background-color: rgba(255, 184, 0, 0.1);
+  color: var(--theme-accent);
+  font-weight: 700;
+}
+
+/* --- Filtro de Datas --- */
+.dateFilter {
+  padding: 0 1.25rem 1.25rem;
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.dateFilter::-webkit-scrollbar { display: none; }
+
+.datePill {
+  min-width: 70px;
+  padding: 0.75rem 0.5rem;
+  border-radius: 16px;
+  background-color: var(--theme-card);
+  border: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.datePillSelected {
+  background-color: var(--theme-accent);
+  color: #000;
+  border-color: var(--theme-accent);
+}
+
+.dateDayName { font-size: 0.75rem; opacity: 0.7; font-weight: 600; }
+.dateNumber { font-size: 1.25rem; font-weight: 700; margin-top: 0.25rem; }
+
+/* --- Conteúdo Base --- */
+.content {
+  padding: 0 1.25rem 1.25rem;
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.content::-webkit-scrollbar { display: none; }
+
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+  color: var(--theme-text-main);
+}
+
+/* --- Agenda List --- */
+.agendaList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.appointmentCard {
+  background-color: var(--theme-card);
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.completedCard { opacity: 0.6; }
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.timeBlock {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--theme-accent);
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.statusBadge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  background-color: rgba(255,255,255,0.1);
+}
+
+.statusBadge.completed {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: var(--theme-success);
+}
+
+.cardBody {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.clientName {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.serviceInfo {
+  font-size: 0.875rem;
+  color: var(--theme-text-muted);
+}
+
+.priceInfo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--theme-text-main);
+}
+
+.actionButton {
+  width: 100%;
+  padding: 0.875rem;
+  border-radius: 12px;
+  border: none;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btnPrimary { background-color: var(--theme-accent); color: #000; }
+
+/* --- Configurações / Formulários --- */
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.inputLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--theme-text-muted);
+}
+
+.inputField {
+  background-color: var(--theme-bg);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--theme-text-main);
+  padding: 1rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.inputField:focus {
+  outline: none;
+  border-color: var(--theme-accent);
+}
+
+.workingDaysGrid {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.workingDayBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--theme-bg);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--theme-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.workingDayBtn.active {
+  background-color: var(--theme-accent);
+  color: #000;
+  border-color: var(--theme-accent);
+}
+
+.timeRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.timeRow span {
+  font-size: 0.875rem;
+  color: var(--theme-text-muted);
+}
+
+.timeInput {
+  background-color: var(--theme-bg);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--theme-text-main);
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.timeInput::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+.copyLinkBox {
+  background-color: var(--theme-card);
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px dashed var(--theme-accent);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+/* --- DESKTOP LAYOUT (PC) --- */
+@media (min-width: 1024px) {
+  .container {
+    flex-direction: row;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .mainWrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow-y: auto;
+    background-color: #050505; /* Um fundo ainda mais escuro para contrastar com os cards */
+  }
+
+  .header {
+    display: none; /* Esconde menu hambúrguer no PC */
+  }
+
+  .drawerOverlay {
+    display: none; /* Sem overlay no PC */
+  }
+
+  .drawer {
+    position: static;
+    transform: translateX(0);
+    width: 280px;
+    height: 100vh;
+    box-shadow: 1px 0 0 rgba(255, 255, 255, 0.05);
+    z-index: 10;
+  }
+
+  .content {
+    padding: 2.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+    overflow-y: visible; /* A rolagem fica no mainWrapper */
+  }
+
+  .earningsCard {
+    margin: 2.5rem auto 1.5rem auto;
+    width: calc(100% - 5rem);
+    max-width: 1060px;
+  }
+
+  /* Grid Views */
+  .agendaList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  /* Centralização das Datas e Títulos */
+  .dateFilter {
+    justify-content: center;
+  }
+
+  .sectionTitle {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+  }
+
+  /* Na aba de Serviços e Configurações, limitar a largura */
+  .inputGroup {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .copyLinkBox {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}

@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------------------------------
+// Arquitetura Multi-Tenant
+// Todas as tabelas operacionais devem obrigatoriamente possuir um barbershopId
+// para garantir o isolamento absoluto dos dados.
+// ----------------------------------------------------------------------------
+
+model Barbershop {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relações (Tudo pertence a uma barbearia)
+  barbers      Barber[]
+  services     Service[]
+  clients      Client[]
+  appointments Appointment[]
+}
+
+model Barber {
+  id           String   @id @default(uuid())
+  name         String
+  phone        String?
+  username     String   @unique
+  password     String
+  active       Boolean  @default(true)
+  barbershopId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  barbershop   Barbershop    @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+}
+
+model Service {
+  id           String   @id @default(uuid())
+  name         String
+  price        Float
+  duration     Int      // duração em minutos
+  barbershopId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  barbershop   Barbershop    @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+}
+
+model Client {
+  id           String   @id @default(uuid())
+  name         String
+  whatsapp     String?
+  username     String   @unique
+  password     String
+  barbershopId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  barbershop   Barbershop    @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+}
+
+model Appointment {
+  id           String   @id @default(uuid())
+  date         DateTime
+  status       String   @default("CONFIRMED") // CONFIRMED, CANCELED, COMPLETED
+  
+  // Relações
+  barberId     String
+  serviceId    String
+  clientId     String
+  barbershopId String
+  
+  barber       Barber     @relation(fields: [barberId], references: [id], onDelete: Cascade)
+  service      Service    @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  client       Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
