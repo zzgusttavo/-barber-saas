@@ -7,6 +7,7 @@ export async function ensureDefaultData() {
     barbershop = await prisma.barbershop.create({
       data: {
         name: 'Barbearia Premium',
+        slug: 'barbearia-premium',
       }
     });
   }
@@ -17,7 +18,7 @@ export async function ensureDefaultData() {
     barber = await prisma.barber.create({
       data: {
         name: 'Carlos Eduardo',
-        username: 'carlos',
+        email: 'carlos@premium.com',
         password: '123',
         barbershopId: barbershop.id
       }
