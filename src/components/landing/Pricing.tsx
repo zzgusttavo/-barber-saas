@@ -5,7 +5,7 @@ import { Check } from "lucide-react";
 import Link from "next/link";
 
 const features = [
-  "Agendamento online 24/7",
+  "Agendamento online 24h",
   "Agenda por barbeiro",
   "Clientes ilimitados",
   "Serviços ilimitados",
