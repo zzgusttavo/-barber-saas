@@ -33,7 +33,7 @@ export default function Hero() {
         >
           <h2 className="text-4xl lg:text-5xl font-black text-white leading-[1.1] tracking-tight mb-6">
             Sua barbearia merece mais clientes e <span className="text-primary">menos bagunça.</span>
-          </h1>
+          </h2>
           <p className="text-lg lg:text-xl text-text-secondary mb-10 max-w-lg leading-relaxed">
             Agendamentos online, organização da agenda, histórico de clientes, lembretes automáticos e relatórios completos em uma plataforma moderna, intuitiva e fácil de usar.
           </p>
