@@ -20,27 +20,35 @@ export default function AppDonoPage() {
   const [waQR, setWaQR] = useState<string | null>(null);
   const [waCode, setWaCode] = useState<string | null>(null);
   const [waStatus, setWaStatus] = useState('loading'); // loading, pending, connected
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  const [businessName, setBusinessName] = useState("Salão Modelo");
-  const [slug, setSlug] = useState("salaomodelo");
-  const [ownerName, setOwnerName] = useState("Carlos Eduardo");
-  const [ownerPhone, setOwnerPhone] = useState("(11) 99999-9999");
-  const [domainHost, setDomainHost] = useState("agendabarber.com");
-  const [domainOrigin, setDomainOrigin] = useState("https://agendabarber.com");
+  const [businessName, setBusinessName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [ownerName, setOwnerName] = useState("");
+  const [ownerPhone, setOwnerPhone] = useState("");
+  const [domainHost, setDomainHost] = useState("");
+  const [domainOrigin, setDomainOrigin] = useState("");
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      const sl = localStorage.getItem('barber_slug');
+      if (!sl) {
+        window.location.href = '/';
+        return;
+      }
+      
       setDomainHost(window.location.host);
       setDomainOrigin(window.location.origin);
       const bn = localStorage.getItem('barber_businessName');
-      const sl = localStorage.getItem('barber_slug');
       const on = localStorage.getItem('barber_fullName');
       const op = localStorage.getItem('barber_phone');
       
       if (bn) setBusinessName(bn);
-      if (sl) setSlug(sl);
+      setSlug(sl);
       if (on) setOwnerName(on);
       if (op) setOwnerPhone(op);
+      
+      setIsLoaded(true);
     }
 
     const checkMobile = () => {
@@ -205,6 +213,8 @@ export default function AppDonoPage() {
     navigator.clipboard.writeText(link);
     alert(`Link copiado: ${link}`);
   };
+
+  if (!isLoaded) return <div style={{ minHeight: '100vh', backgroundColor: 'var(--theme-bg)' }} />;
 
   return (
     <div className={styles.container}>
