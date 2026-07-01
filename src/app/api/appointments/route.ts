@@ -47,10 +47,9 @@ export async function GET(request: Request) {
     }
 
     if (date) {
-      const startDate = new Date(date);
-      startDate.setHours(0, 0, 0, 0);
-      const endDate = new Date(date);
-      endDate.setHours(23, 59, 59, 999);
+      const [yyyy, mm, dd] = date.split('-');
+      const startDate = new Date(Number(yyyy), Number(mm) - 1, Number(dd), 0, 0, 0, 0);
+      const endDate = new Date(Number(yyyy), Number(mm) - 1, Number(dd), 23, 59, 59, 999);
       whereClause.date = { gte: startDate, lte: endDate };
     }
     
