@@ -43,6 +43,8 @@ export async function GET(request: Request) {
         email: !isPublicRequest, // Email só visível para o painel do dono
         active: !isPublicRequest,
         role: !isPublicRequest,
+        specialty: true,
+        avatar: true,
       },
       orderBy: { name: 'asc' }
     });
@@ -71,7 +73,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, email, password, phone } = body;
+    const { name, email, password, phone, specialty, avatar } = body;
 
     if (!name || !email || !password) {
       return NextResponse.json({ error: 'Nome, email e senha são obrigatórios' }, { status: 400 });
@@ -89,10 +91,12 @@ export async function POST(request: Request) {
         name,
         email,
         phone: phone || "",
+        specialty: specialty || null,
+        avatar: avatar || null,
         password: hashedPassword,
         barbershopId: barbershopId
       },
-      select: { id: true, name: true, email: true }
+      select: { id: true, name: true, email: true, specialty: true, avatar: true }
     });
 
     return NextResponse.json(barber, { status: 201 });
@@ -154,7 +158,7 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { id, name, email, password, phone, specialty } = body;
+    const { id, name, email, password, phone, specialty, avatar } = body;
 
     if (!id || !name || !email) {
       return NextResponse.json({ error: 'ID, Nome e E-mail são obrigatórios.' }, { status: 400 });
@@ -164,8 +168,8 @@ export async function PUT(request: Request) {
       name,
       email,
       phone: phone || "",
-      // Se não adicionamos specialty no banco, talvez não precisemos atualizar?
-      // Wait, o model Barber tem 'specialty'? Let's check prisma schema later.
+      specialty: specialty || null,
+      avatar: avatar || null,
     };
 
     if (password) {
@@ -181,7 +185,7 @@ export async function PUT(request: Request) {
     const updatedBarber = await prisma.barber.update({
       where: { id },
       data: dataToUpdate,
-      select: { id: true, name: true, email: true, phone: true }
+      select: { id: true, name: true, email: true, phone: true, specialty: true, avatar: true }
     });
 
     return NextResponse.json(updatedBarber);

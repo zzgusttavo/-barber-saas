@@ -13,7 +13,7 @@ export default function ProfissionaisPage() {
   const [barbers, setBarbers] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBarberId, setEditingBarberId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({ name: '', phone: '', email: '', password: '', specialty: '' });
+  const [formData, setFormData] = useState({ name: '', phone: '', email: '', password: '', specialty: '', avatar: '' });
 
   // Carrega da API ao iniciar
   useEffect(() => {
@@ -39,13 +39,13 @@ export default function ProfissionaisPage() {
       const data = await res.json();
       if (res.ok) {
         if (isEdit) {
-          setBarbers(barbers.map(b => b.id === editingBarberId ? { ...b, ...data, specialty: formData.specialty || 'Geral' } : b));
+          setBarbers(barbers.map(b => b.id === editingBarberId ? { ...b, ...data, specialty: formData.specialty || 'Geral', avatar: formData.avatar } : b));
         } else {
-          setBarbers([...barbers, { ...data, status: 'Ativo', specialty: formData.specialty || 'Geral' }]);
+          setBarbers([...barbers, { ...data, status: 'Ativo', specialty: formData.specialty || 'Geral', avatar: formData.avatar }]);
         }
         setIsModalOpen(false);
         setEditingBarberId(null);
-        setFormData({ name: '', phone: '', email: '', password: '', specialty: '' });
+        setFormData({ name: '', phone: '', email: '', password: '', specialty: '', avatar: '' });
       } else {
         alert(data.error || 'Erro ao salvar barbeiro');
       }
@@ -61,15 +61,31 @@ export default function ProfissionaisPage() {
       phone: barber.phone || '',
       email: barber.email || '',
       password: '', // Não preencher a senha existente
-      specialty: barber.specialty || ''
+      specialty: barber.specialty || '',
+      avatar: barber.avatar || ''
     });
     setIsModalOpen(true);
   };
 
   const openNewBarberModal = () => {
     setEditingBarberId(null);
-    setFormData({ name: '', phone: '', email: '', password: '', specialty: '' });
+    setFormData({ name: '', phone: '', email: '', password: '', specialty: '', avatar: '' });
     setIsModalOpen(true);
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) { // 2MB max
+        alert("A imagem deve ter no máximo 2MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, avatar: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleDeleteBarber = async (id: string) => {
@@ -114,8 +130,12 @@ export default function ProfissionaisPage() {
                   <tr key={barber.id}>
                     <td style={{ fontWeight: 500 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <div style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Scissors size={14} color="var(--text-secondary)" />
+                        <div style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                          {barber.avatar ? (
+                            <img src={barber.avatar} alt={barber.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          ) : (
+                            <Scissors size={14} color="var(--text-secondary)" />
+                          )}
                         </div>
                         {barber.name}
                       </div>
@@ -191,6 +211,24 @@ export default function ProfissionaisPage() {
             value={formData.specialty}
             onChange={(e) => setFormData({...formData, specialty: e.target.value})}
           />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <label style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Foto do Barbeiro</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ width: 64, height: 64, borderRadius: '50%', backgroundColor: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0, border: '1px solid var(--border-color)' }}>
+                {formData.avatar ? (
+                  <img src={formData.avatar} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <Scissors size={24} color="var(--text-tertiary)" />
+                )}
+              </div>
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={handleImageUpload} 
+                style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}
+              />
+            </div>
+          </div>
         </div>
         <div className={styles.modalButtons}>
           <Button variant="ghost" onClick={() => setIsModalOpen(false)} className={styles.modalCancelBtn}>Cancelar</Button>

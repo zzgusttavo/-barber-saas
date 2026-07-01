@@ -453,7 +453,7 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
           >
             {selectedBarber === barbers[0].id && <div className={styles.checkCircle}><Check size={16} strokeWidth={3} /></div>}
             <div className={styles.barberAvatar} style={{ width: 80, height: 80 }}>
-              <img src="https://i.pravatar.cc/150?img=11" alt={barbers[0].name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+              <img src={barbers[0].avatar || "https://i.pravatar.cc/150?img=11"} alt={barbers[0].name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
               <span className={styles.barberName} style={{ textAlign: 'left', fontSize: '1.2rem', marginBottom: '0.25rem' }}>{barbers[0].name}</span>
@@ -478,7 +478,7 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
               >
                 {selectedBarber === barber.id && <div className={styles.checkCircle}><Check size={14} strokeWidth={3} /></div>}
                 <div className={styles.barberAvatar}>
-                  <img src={`https://i.pravatar.cc/150?img=${11 + index}`} alt={barber.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                  <img src={barber.avatar || `https://i.pravatar.cc/150?img=${11 + index}`} alt={barber.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <span className={styles.barberName}>{barber.name}</span>

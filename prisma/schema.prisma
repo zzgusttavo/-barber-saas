@@ -45,6 +45,8 @@ model Barber {
   password     String
   role         String   @default("BARBER") // OWNER | BARBER
   active       Boolean  @default(true)
+  specialty    String?
+  avatar       String?
   barbershopId String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
