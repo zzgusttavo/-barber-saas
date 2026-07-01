@@ -104,6 +104,22 @@ export const authOptions: NextAuthOptions = {
         token.role = (user as any).role;
         token.barbershopId = (user as any).barbershopId;
         token.slug = (user as any).slug;
+      } else if (!token.barbershopId && token.email) {
+        // Migração para tokens antigos que não tinham barbershopId e role
+        try {
+          const barber = await prisma.barber.findUnique({
+            where: { email: token.email as string },
+            include: { barbershop: true }
+          });
+          if (barber) {
+            token.id = barber.id;
+            token.role = "BARBER";
+            token.barbershopId = barber.barbershopId;
+            token.slug = barber.barbershop?.slug;
+          }
+        } catch(e) {
+          console.error("Erro ao migrar token antigo:", e);
+        }
       }
       return token;
     },

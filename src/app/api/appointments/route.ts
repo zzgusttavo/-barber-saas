@@ -24,7 +24,13 @@ export async function GET(request: Request) {
     } else {
       const session = await getServerSession(authOptions);
       if (session && session.user) {
-        targetBarbershopId = (session.user as any).barbershopId;
+        if ((session.user as any).barbershopId) {
+          targetBarbershopId = (session.user as any).barbershopId;
+        } else if (session.user.email) {
+          // Fallback para sessões antigas que não têm barbershopId no JWT
+          const barber = await prisma.barber.findUnique({ where: { email: session.user.email } });
+          if (barber) targetBarbershopId = barber.barbershopId;
+        }
       }
     }
 
