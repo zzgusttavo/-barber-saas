@@ -25,7 +25,7 @@ const mockTimes = ['09:00', '09:40', '10:20', '11:00', '11:40', '13:00', '13:40'
 
 export default function AgendamentoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { data: session, status } = useSession();
-  const isClientLogged = session?.user?.role === 'CLIENT' && (session.user as any).slug === slugStr;
+  const isClientLogged = (session?.user as any)?.role === 'CLIENT' && (session?.user as any)?.slug === slugStr;
   const [barbers, setBarbers] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
 
