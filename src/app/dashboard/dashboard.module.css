@@ -5,6 +5,31 @@
   padding-bottom: 2rem;
 }
 
+.desktopGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .desktopGrid {
+    grid-template-columns: 2fr 1fr; /* Left column 66%, Right column 33% */
+    align-items: start;
+  }
+}
+
+.leftCol {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.rightCol {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
 /* Header Sec */
 .headerTop {
   display: flex;
@@ -68,8 +93,15 @@
 /* 2x2 KPI Grid */
 .kpiGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .kpiGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .kpiCard {

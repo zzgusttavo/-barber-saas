@@ -165,134 +165,158 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Próximo Atendimento */}
-      <div>
-        <div className={styles.sectionHeader}>
-          <span className={styles.sectionTitle} style={{ color: '#16a34a', fontSize: '0.9rem' }}>Próximo atendimento</span>
-        </div>
-        {nextAppointment ? (
-          <div className={styles.nextApptCard}>
-            <div className={styles.nextApptInfo}>
-              <div className={styles.clientAvatarLarge}>
-                <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(nextAppointment.customerName)}&background=random`} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-              </div>
-              <div className={styles.clientDetails}>
-                <span className={styles.clientName}>{nextAppointment.customerName}</span>
-                <span className={styles.clientService}>{services.find(s=>s.id===nextAppointment.serviceId)?.name || 'Serviço'}</span>
-                <span className={styles.clientTime}>
-                  <CalendarDays size={12} /> {new Date(nextAppointment.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} • 40 minutos
-                </span>
-              </div>
-            </div>
-            <div className={`${styles.statusBadge} ${styles.statusConfirmed}`}>
-              <CheckCircle2 size={14} /> Confirmado
-            </div>
-          </div>
-        ) : (
-          <div className={styles.nextApptCard} style={{ justifyContent: 'center', color: '#71717a' }}>
-            Nenhum atendimento próximo hoje.
-          </div>
-        )}
-      </div>
-
-      {/* Agenda de hoje */}
-      <div>
-        <div className={styles.sectionHeader}>
-          <span className={styles.sectionTitle}>Agenda de hoje</span>
-          <span className={styles.sectionLink}>Ver agenda completa <ChevronRight size={14} /></span>
-        </div>
+      <div className={styles.desktopGrid}>
         
-        <div className={styles.agendaList}>
-          {todaysAppointments.length > 0 ? todaysAppointments.map(appt => (
-            <div key={appt.id} className={styles.agendaItem}>
-              <div className={styles.agendaTime}>{new Date(appt.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} <div className={`${styles.agendaDot} ${styles.dotGreen}`}></div></div>
-              <div className={styles.agendaClient}>
-                <div className={styles.agendaAvatar}><img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(appt.customerName)}&background=random`} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} /></div>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span className={styles.agendaClientName}>{appt.customerName}</span>
-                  <span className={styles.agendaClientService}>{services.find(s=>s.id===appt.serviceId)?.name || 'Serviço'}</span>
-                </div>
-              </div>
-              <div className={`${styles.statusBadge} ${styles.statusConfirmed}`} style={{ backgroundColor: '#ffffff', border: '1px solid #16a34a' }}>
-                Confirmado
-              </div>
-              <ChevronRight size={16} color="#d4d4d8" />
-            </div>
-          )) : (
-            <div style={{ padding: '2rem 0', textAlign: 'center', color: '#71717a' }}>Agenda livre hoje!</div>
-          )}
-        </div>
-      </div>
-
-      {/* Faturamento e Clientes */}
-      <div className={styles.splitCols}>
-        {/* Faturamento */}
-        <div className={styles.splitCard}>
-          <div className={styles.splitTitle}>Faturamento <span style={{color: '#a1a1aa', fontWeight: 500}}>(7 dias)</span></div>
-          <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#18181b', marginBottom: '0.5rem' }}>{formatCurrency(totalEarningsToday * 5.5)}</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: '#16a34a', fontSize: '0.75rem', fontWeight: 700, marginBottom: '1rem' }}>
-            ▲ 18,2%
-          </div>
-          {/* Chart placeholder */}
-          <div style={{ height: '60px', width: '100%', background: 'linear-gradient(to top, rgba(34, 197, 94, 0.2), transparent)', position: 'relative', overflow: 'hidden' }}>
-             <svg width="100%" height="100%" viewBox="0 0 100 40" preserveAspectRatio="none" style={{ position: 'absolute', bottom: 0, left: 0 }}>
-               <path d="M0 30 Q 15 20, 30 25 T 50 15 T 70 20 T 100 5" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" />
-             </svg>
-          </div>
-        </div>
-
-        {/* Clientes recentes */}
-        <div className={styles.splitCard}>
-          <div className={styles.splitTitle}>Clientes recentes</div>
+        {/* --- COLUNA ESQUERDA (70% no Desktop, 100% no Mobile) --- */}
+        <div className={styles.leftCol}>
           
-          {appointments.slice(0, 3).map(appt => {
-            const srv = services.find(s => s.id === appt.serviceId);
-            return (
-              <div key={appt.id} className={styles.recentClientRow}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', overflow: 'hidden' }}>
-                  <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(appt.customerName)}&background=random`} alt="Avatar" className={styles.recentAvatar} />
-                  <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                    <span className={styles.recentName} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{appt.customerName.split(" ")[0]}</span>
-                    <span className={styles.recentService} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{srv?.name}</span>
+          {/* Agenda de hoje */}
+          <div>
+            <div className={styles.sectionHeader}>
+              <span className={styles.sectionTitle}>Agenda de hoje</span>
+              <span className={styles.sectionLink}>Ver agenda completa <ChevronRight size={14} /></span>
+            </div>
+            
+            <div className={styles.agendaList}>
+              {todaysAppointments.length > 0 ? todaysAppointments.map(appt => (
+                <div key={appt.id} className={styles.agendaItem}>
+                  <div className={styles.agendaTime}>{new Date(appt.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} <div className={`${styles.agendaDot} ${styles.dotGreen}`}></div></div>
+                  <div className={styles.agendaClient}>
+                    <div className={styles.agendaAvatar}><img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(appt.customerName)}&background=random`} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} /></div>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span className={styles.agendaClientName}>{appt.customerName}</span>
+                      <span className={styles.agendaClientService}>{services.find(s=>s.id===appt.serviceId)?.name || 'Serviço'}</span>
+                    </div>
+                  </div>
+                  <div className={`${styles.statusBadge} ${styles.statusConfirmed}`} style={{ backgroundColor: '#ffffff', border: '1px solid #16a34a' }}>
+                    Confirmado
+                  </div>
+                  <ChevronRight size={16} color="#d4d4d8" />
+                </div>
+              )) : (
+                <div style={{ padding: '2rem 0', textAlign: 'center', color: '#71717a' }}>Agenda livre hoje!</div>
+              )}
+            </div>
+          </div>
+
+          {/* Clientes recentes */}
+          <div className={styles.splitCard}>
+            <div className={styles.splitTitle}>Clientes recentes</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px solid rgba(0,0,0,0.05)', color: '#71717a', fontSize: '0.75rem', fontWeight: 600 }}>
+              <span>Cliente</span>
+              <span style={{flex: 1, marginLeft: '1rem'}}>Último serviço</span>
+              <span>Gasto total</span>
+            </div>
+            
+            {appointments.slice(0, 3).map(appt => {
+              const srv = services.find(s => s.id === appt.serviceId);
+              return (
+                <div key={appt.id} className={styles.recentClientRow}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', overflow: 'hidden', minWidth: '120px' }}>
+                    <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(appt.customerName)}&background=random`} alt="Avatar" className={styles.recentAvatar} />
+                    <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                      <span className={styles.recentName} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{appt.customerName.split(" ")[0]}</span>
+                    </div>
+                  </div>
+                  <span className={styles.recentService} style={{ flex: 1, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', marginLeft: '1rem' }}>{srv?.name}</span>
+                  <span className={styles.recentPrice}>{formatCurrency(Number(srv?.price || 0))}</span>
+                </div>
+              )
+            })}
+            
+            <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+              <span className={styles.sectionLink} style={{ color: '#16a34a', justifyContent: 'center' }}>Ver todos os clientes <ChevronRight size={12} /></span>
+            </div>
+          </div>
+
+        </div>
+
+        {/* --- COLUNA DIREITA (30% no Desktop, 100% no Mobile) --- */}
+        <div className={styles.rightCol}>
+          
+          {/* Próximo Atendimento */}
+          <div>
+            <div className={styles.sectionHeader}>
+              <span className={styles.sectionTitle} style={{ fontSize: '0.95rem' }}>Próximo atendimento</span>
+            </div>
+            {nextAppointment ? (
+              <div className={styles.nextApptCard}>
+                <div className={styles.nextApptInfo}>
+                  <div className={styles.clientAvatarLarge}>
+                    <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(nextAppointment.customerName)}&background=random`} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                  </div>
+                  <div className={styles.clientDetails}>
+                    <span className={styles.clientName}>{nextAppointment.customerName}</span>
+                    <span className={styles.clientService}>{services.find(s=>s.id===nextAppointment.serviceId)?.name || 'Serviço'}</span>
+                    <span className={styles.clientTime}>
+                      <CalendarDays size={12} /> {new Date(nextAppointment.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} • 40 minutos
+                    </span>
                   </div>
                 </div>
-                <span className={styles.recentPrice}>{formatCurrency(Number(srv?.price || 0))}</span>
+                <div className={`${styles.statusBadge} ${styles.statusConfirmed}`}>
+                  Confirmado
+                </div>
               </div>
-            )
-          })}
-          
-          <div style={{ textAlign: 'center', marginTop: '0.5rem' }}>
-            <span className={styles.sectionLink} style={{ color: '#16a34a', justifyContent: 'center' }}>Ver todos <ChevronRight size={12} /></span>
+            ) : (
+              <div className={styles.nextApptCard} style={{ justifyContent: 'center', color: '#71717a' }}>
+                Nenhum atendimento próximo.
+              </div>
+            )}
           </div>
+
+          {/* Faturamento da Semana */}
+          <div className={styles.splitCard}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div className={styles.splitTitle}>Faturamento da semana</div>
+              <span style={{ fontSize: '0.75rem', color: '#71717a' }}>Semana atual ▾</span>
+            </div>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '1rem' }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#16a34a' }}>{formatCurrency(totalEarningsToday * 5.5)}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.25rem', color: '#16a34a', fontSize: '0.75rem', fontWeight: 700 }}>
+                ▲ 18,2%
+                <span style={{ color: '#a1a1aa', fontWeight: 500, fontSize: '0.65rem' }}>vs semana anterior</span>
+              </div>
+            </div>
+            
+            {/* Chart placeholder */}
+            <div style={{ height: '100px', width: '100%', marginTop: '1rem', background: 'linear-gradient(to top, rgba(34, 197, 94, 0.1), transparent)', position: 'relative', overflow: 'hidden', borderRadius: '8px' }}>
+               <svg width="100%" height="100%" viewBox="0 0 100 40" preserveAspectRatio="none" style={{ position: 'absolute', bottom: 0, left: 0 }}>
+                 <path d="M0 35 Q 15 25, 30 30 T 50 15 T 70 20 T 85 5 T 100 10" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" />
+               </svg>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', color: '#a1a1aa', fontSize: '0.65rem' }}>
+              <span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span>Dom</span>
+            </div>
+          </div>
+
+          {/* Ações rápidas */}
+          <div>
+            <div className={styles.sectionHeader}>
+              <span className={styles.sectionTitle} style={{ fontSize: '1rem' }}>Atalhos rápidos</span>
+            </div>
+            <div className={styles.quickActionsGrid}>
+              <button onClick={() => router.push('/dashboard/agenda')} className={styles.quickActionCard} style={{ backgroundColor: 'rgba(34, 197, 94, 0.05)' }}>
+                <Plus size={24} color="#16a34a" />
+                <span className={styles.quickActionTitle}>Novo Agendamento</span>
+              </button>
+              <button onClick={() => router.push('/dashboard/clientes')} className={styles.quickActionCard} style={{ backgroundColor: 'rgba(59, 130, 246, 0.05)' }}>
+                <UserPlus size={24} color="#3b82f6" />
+                <span className={styles.quickActionTitle}>Novo Cliente</span>
+              </button>
+              <button onClick={() => router.push('/dashboard/servicos')} className={styles.quickActionCard} style={{ backgroundColor: 'rgba(168, 85, 247, 0.05)' }}>
+                <Scissors size={24} color="#a855f7" />
+                <span className={styles.quickActionTitle}>Novo Serviço</span>
+              </button>
+              <button className={styles.quickActionCard} style={{ backgroundColor: 'rgba(234, 179, 8, 0.05)' }}>
+                <Banknote size={24} color="#eab308" />
+                <span className={styles.quickActionTitle}>Registrar Venda</span>
+              </button>
+            </div>
+          </div>
+
         </div>
-      </div>
 
-      {/* Ações rápidas */}
-      <div>
-        <div className={styles.sectionHeader}>
-          <span className={styles.sectionTitle} style={{ fontSize: '1rem' }}>Ações rápidas</span>
-        </div>
-        <div className={styles.quickActionsGrid}>
-          <button onClick={() => router.push('/dashboard/agenda')} className={styles.quickActionCard} style={{ backgroundColor: 'rgba(34, 197, 94, 0.05)' }}>
-            <Plus size={24} color="#16a34a" />
-            <span className={styles.quickActionTitle}>Novo Agendamento</span>
-          </button>
-
-          <button onClick={() => router.push('/dashboard/clientes')} className={styles.quickActionCard} style={{ backgroundColor: 'rgba(59, 130, 246, 0.05)' }}>
-            <UserPlus size={24} color="#3b82f6" />
-            <span className={styles.quickActionTitle}>Novo Cliente</span>
-          </button>
-
-          <button onClick={() => router.push('/dashboard/servicos')} className={styles.quickActionCard} style={{ backgroundColor: 'rgba(168, 85, 247, 0.05)' }}>
-            <Scissors size={24} color="#a855f7" />
-            <span className={styles.quickActionTitle}>Novo Serviço</span>
-          </button>
-
-          <button className={styles.quickActionCard} style={{ backgroundColor: 'rgba(234, 179, 8, 0.05)' }}>
-            <Banknote size={24} color="#eab308" />
-            <span className={styles.quickActionTitle}>Registrar Venda</span>
-          </button>
-        </div>
       </div>
 
     </div>

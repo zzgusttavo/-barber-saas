@@ -37,8 +37,8 @@ export default function ConfiguracoesPage() {
   };
 
   return (
-    <div style={{ paddingBottom: '2rem' }}>
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#18181b', marginBottom: '1.5rem' }}>Configurações</h1>
+    <div style={{ paddingBottom: '2rem', maxWidth: '800px', margin: '0 auto' }}>
+      <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#18181b', marginBottom: '1.5rem' }}>Perfil & Sistema</h1>
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem', backgroundColor: '#fff', padding: '2rem 1rem', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.02)', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
         <div style={{ width: 80, height: 80, borderRadius: '50%', backgroundColor: '#e4e4e7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', position: 'relative' }}>

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import styles from './layout.module.css';
-import { Home, CalendarDays, Users, User, Plus } from 'lucide-react';
+import { Home, CalendarDays, Users, User, Plus, LogOut, FileText, Banknote, Scissors, Settings, Crown } from 'lucide-react';
 
 export default function DashboardLayout({
   children,
@@ -14,7 +14,7 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { status } = useSession();
+  const { data: session, status } = useSession();
 
   React.useEffect(() => {
     if (status === 'unauthenticated') {
@@ -28,6 +28,68 @@ export default function DashboardLayout({
 
   return (
     <div className={styles.layout}>
+      {/* Sidebar - Desktop Only */}
+      <aside className={styles.sidebar}>
+        <div className={styles.sidebarHeader}>
+          <div className={styles.avatarLogo}>
+            <User size={24} color="#16a34a" />
+          </div>
+          <div className={styles.brandInfo}>
+            <span className={styles.brandName}>{session?.user?.name?.split(' ')[0] || 'Gustavo'}</span>
+            <span className={styles.brandSubtitle}>Profissional</span>
+          </div>
+        </div>
+
+        <nav className={styles.sidebarNav}>
+          <Link href="/dashboard" className={`${styles.sidebarItem} ${pathname === '/dashboard' ? styles.sidebarItemActive : ''}`}>
+            <Home size={20} />
+            <span>Dashboard</span>
+          </Link>
+          <Link href="/dashboard/agenda" className={`${styles.sidebarItem} ${pathname.startsWith('/dashboard/agenda') ? styles.sidebarItemActive : ''}`}>
+            <CalendarDays size={20} />
+            <span>Agenda</span>
+          </Link>
+          <Link href="/dashboard/clientes" className={`${styles.sidebarItem} ${pathname.startsWith('/dashboard/clientes') ? styles.sidebarItemActive : ''}`}>
+            <Users size={20} />
+            <span>Clientes</span>
+          </Link>
+          <Link href="/dashboard/servicos" className={`${styles.sidebarItem} ${pathname.startsWith('/dashboard/servicos') ? styles.sidebarItemActive : ''}`}>
+            <Scissors size={20} />
+            <span>Serviços</span>
+          </Link>
+          
+          <div className={styles.sidebarDivider}></div>
+
+          <Link href="/dashboard" className={styles.sidebarItem}>
+            <Banknote size={20} />
+            <span>Meu Caixa</span>
+          </Link>
+          <Link href="/dashboard" className={styles.sidebarItem}>
+            <FileText size={20} />
+            <span>Relatórios</span>
+          </Link>
+          <Link href="/dashboard/configuracoes" className={`${styles.sidebarItem} ${pathname.startsWith('/dashboard/configuracoes') ? styles.sidebarItemActive : ''}`}>
+            <Settings size={20} />
+            <span>Configurações</span>
+          </Link>
+        </nav>
+
+        <div className={styles.sidebarFooter}>
+          <div className={styles.premiumCard}>
+            <Crown size={24} color="#16a34a" />
+            <span className={styles.premiumTitle}>Seu plano</span>
+            <span className={styles.premiumText}>Premium</span>
+            <span className={styles.premiumSubtitle}>Renova em 25/08</span>
+            <Link href="/dashboard" className={styles.premiumLink}>Gerenciar assinatura →</Link>
+          </div>
+
+          <button onClick={() => window.location.href = '/api/auth/signout'} className={styles.logoutButton}>
+            <LogOut size={20} />
+            <span>Sair</span>
+          </button>
+        </div>
+      </aside>
+
       <main className={styles.main}>
         <div className={styles.content}>
           {children}
