@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import styles from './agendamento.module.css';
 import { 
   Menu, Bell, Settings, MapPin, Globe, Share2,
-  Scissors, User, CheckCircle2, Phone, ChevronLeft, ChevronRight, X, Sun, Moon, Camera, Key
+  Scissors, User, CheckCircle2, Phone, ChevronLeft, ChevronRight, X, Sun, Moon, Camera, Key, Check, Star, Trophy, Calendar, Clock, ArrowRight
 } from 'lucide-react';
 
 const MustacheIcon = ({ size, color, style, ...props }: any) => (
@@ -274,32 +274,86 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
         </div>
 
         <h1 className={styles.shopName}>{businessName}</h1>
-        <div className={styles.shopSubtitle}>Barbearia Premium</div>
-      </div>
-
-      <div className={styles.contentBlock}>
-        <h2 className={styles.blockTitle}>Escolha o Profissional</h2>
-        {barbers.length === 0 && <div style={{color:'var(--theme-text-muted)'}}>Nenhum profissional cadastrado.</div>}
-        <div className={styles.barberScroll}>
-          {barbers.map(barber => (
-            <div 
-              key={barber.id}
-              className={`${styles.barberCard} ${selectedBarber === barber.id ? styles.barberCardSelected : ''}`}
-              onClick={() => { setSelectedBarber(barber.id); setSelectedTime(null); }}
-            >
-              <div className={styles.barberAvatar}>
-                <User size={24} color={selectedBarber === barber.id ? '#000' : 'var(--theme-text-muted)'} />
-              </div>
-              <span className={styles.barberName}>{barber.name}</span>
-            </div>
-          ))}
+        <div className={styles.shopSubtitle}>BARBEARIA PREMIUM</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.5rem', color: 'var(--theme-text-muted)', fontSize: '0.9rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: '#eab308' }}>
+            <Star size={16} fill="#eab308" /> 4,9
+          </div>
+          <span>(386 avaliações)</span>
+          <span>•</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <div style={{ width: 8, height: 8, backgroundColor: '#22c55e', borderRadius: '50%' }}></div>
+            Aberto até 20h
+          </div>
         </div>
       </div>
 
       <div className={styles.contentBlock}>
-        <h2 className={styles.blockTitle}>Escolha o Serviço</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <h2 className={styles.blockTitle} style={{ margin: 0 }}><User size={20} color="var(--theme-accent)" /> 1. Escolha o profissional</h2>
+          <span style={{ color: 'var(--theme-accent)', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}>Ver todos</span>
+        </div>
+        {barbers.length === 0 && <div style={{color:'var(--theme-text-muted)'}}>Nenhum profissional cadastrado.</div>}
+        
+        {barbers.length === 1 ? (
+          <div 
+            className={`${styles.barberCardSingle} ${selectedBarber === barbers[0].id ? styles.barberCardSingleSelected : ''}`}
+            onClick={() => { setSelectedBarber(barbers[0].id); setSelectedTime(null); }}
+          >
+            {selectedBarber === barbers[0].id && <div className={styles.checkCircle}><Check size={16} strokeWidth={3} /></div>}
+            <div className={styles.barberAvatar} style={{ width: 80, height: 80 }}>
+              <img src="https://i.pravatar.cc/150?img=11" alt={barbers[0].name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+              <span className={styles.barberName} style={{ textAlign: 'left', fontSize: '1.2rem', marginBottom: '0.25rem' }}>{barbers[0].name}</span>
+              <span className={styles.barberTitleSingle}>Barbeiro Premium</span>
+              <div className={styles.barberStatsSingle}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <Star size={14} color="#eab308" fill="#eab308" /> <span style={{ color: '#fff', fontWeight: 700 }}>4,9</span> (386 avaliações)
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <Trophy size={14} color="var(--theme-text-muted)" /> +4.000 cortes realizados
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className={styles.barberScroll}>
+            {barbers.map((barber, index) => (
+              <div 
+                key={barber.id}
+                className={`${styles.barberCard} ${selectedBarber === barber.id ? styles.barberCardSelected : ''}`}
+                onClick={() => { setSelectedBarber(barber.id); setSelectedTime(null); }}
+              >
+                {selectedBarber === barber.id && <div className={styles.checkCircle}><Check size={14} strokeWidth={3} /></div>}
+                <div className={styles.barberAvatar}>
+                  <img src={`https://i.pravatar.cc/150?img=${11 + index}`} alt={barber.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <span className={styles.barberName}>{barber.name}</span>
+                  <span className={styles.barberTitle}>Barbeiro</span>
+                  <div className={styles.barberStats}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <Star size={12} color="#eab308" fill="#eab308" /> <span style={{ color: '#fff', fontWeight: 700 }}>4,{9-index}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <Trophy size={12} color="var(--theme-text-muted)" /> +{4-index}.{3+index}00 cortes
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className={styles.contentBlock}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <h2 className={styles.blockTitle} style={{ margin: 0 }}><Scissors size={20} color="var(--theme-accent)" /> 2. Escolha o serviço</h2>
+          <span style={{ color: 'var(--theme-accent)', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}>Ver todos</span>
+        </div>
         {services.length === 0 && <div style={{color:'var(--theme-text-muted)'}}>Nenhum serviço cadastrado.</div>}
-        <div className={styles.serviceGrid}>
+        <div className={styles.serviceScroll}>
           {services.map((service) => {
             const Icon = service.icon || Scissors;
             return (
@@ -308,11 +362,15 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
                 className={`${styles.serviceCard} ${selectedService === service.id ? styles.serviceCardSelected : ''}`}
                 onClick={() => setSelectedService(service.id)}
               >
+                {selectedService === service.id && <div className={styles.checkCircle}><Check size={14} strokeWidth={3} /></div>}
                 <div className={styles.serviceIconWrapper}>
-                  <Icon size={48} strokeWidth={1.25} />
+                  <Icon size={32} strokeWidth={1.25} />
                 </div>
                 <div className={styles.serviceName}>{service.name}</div>
-                <div style={{ fontWeight: 700, marginTop: '-0.5rem' }}>{formatCurrency(service.price)}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--theme-text-muted)', fontSize: '0.8rem' }}>
+                  <Clock size={12} /> {service.duration || '40'} min
+                </div>
+                <div style={{ fontWeight: 700, marginTop: '0.25rem', color: 'var(--theme-accent)', fontSize: '1.1rem' }}>{formatCurrency(service.price)}</div>
               </div>
             );
           })}
@@ -320,7 +378,7 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
       </div>
 
       <div className={styles.contentBlock}>
-        <h2 className={styles.blockTitle}>Escolha a Data e o Horário</h2>
+        <h2 className={styles.blockTitle} style={{ marginBottom: '1.5rem' }}><Calendar size={20} color="var(--theme-accent)" /> 3. Escolha a data</h2>
         
         <div className={styles.dateFilter}>
           {nextDays.map((d, i) => (
@@ -330,11 +388,16 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
               onClick={() => handleDateSelect(d.fullDate)}
             >
               <span className={styles.dateDayName}>{d.dayName}</span>
-              <span className={styles.dateNumber}>{d.dayNumber}</span>
+              <span className={styles.dateNumber}>{String(d.dayNumber).padStart(2, '0')}</span>
+              <span className={styles.dateMonthName}>JUL</span>
+              {selectedDate === d.fullDate && <div className={styles.dateActiveDot}></div>}
             </div>
           ))}
         </div>
+      </div>
 
+      <div className={styles.contentBlock}>
+        <h2 className={styles.blockTitle} style={{ marginBottom: '1.5rem' }}><Clock size={20} color="var(--theme-accent)" /> 4. Escolha o horário</h2>
         {selectedBarber ? (
           <div className={styles.timeGrid}>
             {mockTimes.map((time) => {
@@ -343,10 +406,11 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
                 <div 
                   key={time}
                   className={`${styles.timeSlot} ${selectedTime === time ? styles.timeSlotSelected : ''}`}
-                  style={{ opacity: disabled ? 0.3 : 1, cursor: disabled ? 'not-allowed' : 'pointer', background: disabled ? 'var(--theme-card)' : '' }}
+                  style={{ opacity: disabled ? 0.6 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
                   onClick={() => !disabled && setSelectedTime(time)}
                 >
-                  {time}
+                  <span className={styles.timeText}>{time}</span>
+                  <span className={`${styles.timeStatus} ${disabled ? styles.timeStatusUnavailable : ''}`}>{disabled ? 'Indisponível' : 'Disponível'}</span>
                 </div>
               )
             })}
@@ -358,15 +422,40 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
         )}
       </div>
 
-          <div className={styles.footerActions}>
-            <button 
-              className={styles.primaryButton} 
-              disabled={!isFormComplete}
-              onClick={handleOpenAuth}
-            >
-              {isFormComplete ? 'AGENDAR HORÁRIO' : 'SELECIONE AS OPÇÕES'}
-            </button>
+      <div className={styles.footerActions}>
+        <div className={styles.footerSummary}>
+          <div className={styles.footerAvatar}>
+            {selectedBarber ? (
+              <img src="https://i.pravatar.cc/150?img=11" alt="Barber" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+            ) : (
+              <Scissors size={20} color="var(--theme-text-muted)" />
+            )}
           </div>
+          <div className={styles.footerInfo}>
+            <span className={styles.footerTitle}>Resumo do agendamento</span>
+            <span className={styles.footerService}>
+              {selectedBarber ? barbers.find(b=>b.id===selectedBarber)?.name : 'Profissional'} • {selectedService ? services.find(s=>s.id===selectedService)?.name : 'Serviço'}
+            </span>
+            <span className={styles.footerDetails}>
+              <Clock size={10} /> 40 min • <Calendar size={10} /> {selectedDate ? selectedDate.split('-')[2] : '--'} JUL • <Clock size={10} /> {selectedTime || '--:--'}
+            </span>
+          </div>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div className={styles.footerPriceCol}>
+            <span className={styles.footerPrice}>{selectedService ? formatCurrency(services.find(s=>s.id===selectedService)?.price || 0) : 'R$ 0,00'}</span>
+            <span className={styles.footerPriceLabel}>Valor total</span>
+          </div>
+          <button 
+            className={styles.primaryButton} 
+            disabled={!isFormComplete}
+            onClick={handleOpenAuth}
+          >
+            Continuar <ArrowRight size={18} />
+          </button>
+        </div>
+      </div>
         </>
       )}
 

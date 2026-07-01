@@ -3,10 +3,10 @@
 
 .container {
   --theme-bg: #050505;
-  --theme-card: #0f0f11;
+  --theme-card: #121212;
   --theme-card-hover: #1a1a1d;
-  --theme-accent: #d4af37; /* Premium Gold */
-  --theme-accent-glow: rgba(212, 175, 55, 0.3);
+  --theme-accent: #eab308; /* Premium Gold */
+  --theme-accent-glow: rgba(234, 179, 8, 0.15);
   --theme-text-main: #ffffff;
   --theme-text-muted: #8b8b93;
   --theme-border: rgba(255, 255, 255, 0.08);
@@ -170,35 +170,55 @@
 .barberScroll::-webkit-scrollbar { display: none; }
 
 .barberCard {
-  min-width: 110px;
+  min-width: 140px;
   background: var(--theme-card);
-  border-radius: 20px;
-  padding: 1.5rem 0.5rem;
+  border-radius: 16px;
+  padding: 1.5rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
   border: 1px solid var(--theme-border);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
   overflow: hidden;
 }
-.barberCard::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; height: 100%;
-  background: linear-gradient(to bottom, var(--theme-accent-glow), transparent);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+
+.barberCardSingle {
+  width: 100%;
+  background: var(--theme-card);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.5rem;
+  border: 1px solid var(--theme-border);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
 }
 
-.barberCardSelected {
-  border-color: var(--theme-accent);
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.4), 0 0 0 1px var(--theme-accent);
+.checkCircle {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  background-color: var(--theme-accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  z-index: 10;
 }
-.barberCardSelected::before { opacity: 1; }
+
+.barberCardSelected, .barberCardSingleSelected {
+  border-color: var(--theme-accent);
+}
 
 .barberAvatar {
   width: 64px;
@@ -220,39 +240,71 @@
 }
 
 .barberName {
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   text-align: center;
   z-index: 1;
 }
 
-.serviceGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+.barberTitle {
+  font-size: 0.8rem;
+  color: var(--theme-text-muted);
+  text-align: center;
 }
 
+.barberTitleSingle {
+  font-size: 0.9rem;
+  color: var(--theme-accent);
+  font-weight: 600;
+}
+
+.barberStats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--theme-text-muted);
+  margin-top: 0.5rem;
+}
+
+.barberStatsSingle {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--theme-text-muted);
+  margin-top: 0.5rem;
+}
+
+.serviceScroll {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  scrollbar-width: none; 
+}
+.serviceScroll::-webkit-scrollbar { display: none; }
+
 .serviceCard {
+  min-width: 140px;
   background: var(--theme-card);
-  border-radius: 20px;
-  padding: 1.5rem;
+  border-radius: 16px;
+  padding: 1.5rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.5rem;
   border: 1px solid var(--theme-border);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
-  overflow: hidden;
 }
 
 .serviceCardSelected {
   border-color: var(--theme-accent);
-  background: linear-gradient(145deg, var(--theme-card), #161510);
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.4), 0 0 0 1px var(--theme-accent);
 }
 
 .serviceIconWrapper {
@@ -285,9 +337,9 @@
 .dateFilter::-webkit-scrollbar { display: none; }
 
 .datePill {
-  min-width: 80px;
+  min-width: 70px;
   padding: 1.25rem 0.5rem;
-  border-radius: 20px;
+  border-radius: 12px;
   background: var(--theme-card);
   border: 1px solid var(--theme-border);
   display: flex;
@@ -296,44 +348,70 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .datePillSelected {
-  background: var(--theme-accent);
-  color: #000;
+  background: transparent;
+  color: var(--theme-accent);
   border-color: var(--theme-accent);
-  transform: translateY(-4px);
-  box-shadow: 0 10px 20px var(--theme-accent-glow);
 }
 
-.dateDayName { font-size: 0.8rem; opacity: 0.8; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-.dateNumber { font-size: 1.75rem; font-weight: 700; margin-top: 0.25rem; }
+.dateDayName { font-size: 0.75rem; opacity: 0.8; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+.datePillSelected .dateDayName { color: var(--theme-accent); opacity: 1; }
+
+.dateNumber { font-size: 1.5rem; font-weight: 700; margin-top: 0.25rem; color: var(--theme-text-main); }
+
+.dateMonthName { font-size: 0.75rem; opacity: 0.8; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 0.25rem;}
+.datePillSelected .dateMonthName { color: var(--theme-accent); opacity: 1; }
+
+.dateActiveDot {
+  width: 6px;
+  height: 6px;
+  background-color: #22c55e;
+  border-radius: 50%;
+  margin-top: 4px;
+}
 
 .timeGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.75rem;
 }
 
 .timeSlot {
   background: var(--theme-card);
-  padding: 1rem 0;
+  padding: 0.75rem 0;
   text-align: center;
-  border-radius: 14px;
+  border-radius: 12px;
   font-weight: 600;
   border: 1px solid var(--theme-border);
   transition: all 0.2s ease;
-  font-size: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
 }
-.timeSlot:hover {
-  border-color: rgba(255,255,255,0.2);
+
+.timeText {
+  font-size: 1rem;
+  color: var(--theme-text-main);
+}
+.timeStatus {
+  font-size: 0.65rem;
+  color: #22c55e;
+  font-weight: 400;
+}
+.timeStatusUnavailable {
+  color: #ef4444;
 }
 
 .timeSlotSelected {
-  background: var(--theme-accent);
-  color: #000;
+  background: transparent;
   border-color: var(--theme-accent);
-  box-shadow: 0 4px 15px var(--theme-accent-glow);
+}
+.timeSlotSelected .timeText {
+  color: var(--theme-accent);
 }
 
 .footerActions {
@@ -341,41 +419,94 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 1.5rem;
-  background: rgba(5, 5, 5, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  padding: 1rem 1.5rem;
+  background: var(--theme-card);
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
   z-index: 30;
   border-top: 1px solid var(--theme-border);
 }
 
-.primaryButton {
-  background: linear-gradient(135deg, var(--theme-accent), #b49126);
-  color: #000000;
-  font-weight: 700;
-  font-size: 1.1rem;
-  padding: 1.25rem 2rem;
-  border-radius: 16px;
-  border: none;
-  cursor: pointer;
-  letter-spacing: 0.03em;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 8px 25px var(--theme-accent-glow);
-  transition: all 0.3s ease;
+.footerSummary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.footerAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--theme-bg);
+  border: 1px solid var(--theme-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footerInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.footerTitle {
+  font-size: 0.65rem;
+  color: var(--theme-text-muted);
   text-transform: uppercase;
 }
+
+.footerService {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--theme-text-main);
+}
+
+.footerDetails {
+  font-size: 0.7rem;
+  color: var(--theme-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.footerPriceCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-right: 1rem;
+}
+
+.footerPrice {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--theme-text-main);
+}
+
+.footerPriceLabel {
+  font-size: 0.65rem;
+  color: var(--theme-text-muted);
+}
+
+.primaryButton {
+  background: var(--theme-accent);
+  color: #000000;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
 .primaryButton:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(212, 175, 55, 0.4);
+  opacity: 0.9;
 }
 .primaryButton:disabled {
-  background: var(--theme-card);
-  color: var(--theme-text-muted);
-  box-shadow: none;
-  border: 1px solid var(--theme-border);
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
