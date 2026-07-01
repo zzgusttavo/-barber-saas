@@ -93,9 +93,10 @@ export default function DashboardPage() {
             {new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', weekday: 'long' })}
           </div>
         </div>
-        <div className={styles.headerActions}>
-          <button className={styles.bellButton}>
-            <Bell size={20} strokeWidth={2} />
+        <div className={styles.headerTopRight}>
+          <button className={styles.bellButton} onClick={() => alert('Nenhuma notificação nova')}>
+            <Bell size={20} color="#71717a" />
+            <div className={styles.notificationDot}></div>
           </button>
           <div className={styles.avatar}>
             <img src="https://i.pravatar.cc/150?img=11" alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
@@ -174,7 +175,7 @@ export default function DashboardPage() {
           <div>
             <div className={styles.sectionHeader}>
               <span className={styles.sectionTitle}>Agenda de hoje</span>
-              <span className={styles.sectionLink}>Ver agenda completa <ChevronRight size={14} /></span>
+              <span className={styles.sectionLink} onClick={() => router.push('/dashboard/agenda')} style={{ cursor: 'pointer' }}>Ver agenda completa <ChevronRight size={14} /></span>
             </div>
             
             <div className={styles.agendaList}>
@@ -225,7 +226,7 @@ export default function DashboardPage() {
             })}
             
             <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-              <span className={styles.sectionLink} style={{ color: '#16a34a', justifyContent: 'center' }}>Ver todos os clientes <ChevronRight size={12} /></span>
+              <span className={styles.sectionLink} onClick={() => router.push('/dashboard/clientes')} style={{ color: '#16a34a', justifyContent: 'center', cursor: 'pointer' }}>Ver todos os clientes <ChevronRight size={12} /></span>
             </div>
           </div>
 
@@ -308,7 +309,7 @@ export default function DashboardPage() {
                 <Scissors size={24} color="#a855f7" />
                 <span className={styles.quickActionTitle}>Novo Serviço</span>
               </button>
-              <button className={styles.quickActionCard} style={{ backgroundColor: 'rgba(234, 179, 8, 0.05)' }}>
+              <button onClick={() => alert('Módulo de vendas em breve!')} className={styles.quickActionCard} style={{ backgroundColor: 'rgba(234, 179, 8, 0.05)' }}>
                 <Banknote size={24} color="#eab308" />
                 <span className={styles.quickActionTitle}>Registrar Venda</span>
               </button>

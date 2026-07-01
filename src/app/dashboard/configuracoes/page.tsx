@@ -82,8 +82,15 @@ export default function ConfiguracoesPage() {
         <p style={{ color: '#71717a', fontSize: '0.875rem', marginBottom: '1rem' }}>Compartilhe o link do seu app no WhatsApp ou Instagram.</p>
         
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button style={{ flex: 1, backgroundColor: '#22c55e', color: '#fff', padding: '0.75rem', borderRadius: '8px', border: 'none', fontWeight: 600, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
-            <Share2 size={16} /> Compartilhar
+          <button onClick={() => {
+            if (navigator.share) {
+              navigator.share({ title: 'Agende seu horário', url: `${domainOrigin}/agendar/${slug}` });
+            } else {
+              alert('Compartilhamento direto indisponível. Copie o link.');
+            }
+          }} style={{ flex: 1, backgroundColor: '#22c55e', color: '#fff', padding: '0.75rem', borderRadius: '8px', border: 'none', fontWeight: 600, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+            <Share2 size={18} />
+            Compartilhar
           </button>
           <button onClick={handleCopyLink} style={{ backgroundColor: '#f4f4f5', color: '#18181b', padding: '0.75rem', borderRadius: '8px', border: 'none', fontWeight: 600, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
             <Copy size={16} /> Copiar

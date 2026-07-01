@@ -60,11 +60,11 @@ export default function DashboardLayout({
           
           <div className={styles.sidebarDivider}></div>
 
-          <Link href="/dashboard" className={styles.sidebarItem}>
+          <Link href="#" onClick={(e) => { e.preventDefault(); alert('Em breve!'); }} className={styles.sidebarItem}>
             <Banknote size={20} />
             <span>Meu Caixa</span>
           </Link>
-          <Link href="/dashboard" className={styles.sidebarItem}>
+          <Link href="#" onClick={(e) => { e.preventDefault(); alert('Em breve!'); }} className={styles.sidebarItem}>
             <FileText size={20} />
             <span>Relatórios</span>
           </Link>
@@ -80,7 +80,7 @@ export default function DashboardLayout({
             <span className={styles.premiumTitle}>Seu plano</span>
             <span className={styles.premiumText}>Premium</span>
             <span className={styles.premiumSubtitle}>Renova em 25/08</span>
-            <Link href="/dashboard" className={styles.premiumLink}>Gerenciar assinatura →</Link>
+            <Link href="/dashboard/assinatura" className={styles.premiumLink}>Gerenciar assinatura →</Link>
           </div>
 
           <button onClick={() => window.location.href = '/api/auth/signout'} className={styles.logoutButton}>
@@ -116,7 +116,7 @@ export default function DashboardLayout({
 
         {/* Botão Central Flutuante FAB */}
         <div className={styles.fabContainer}>
-          <button className={styles.fabButton} onClick={() => alert('Abrir modal de ações rápidas!')}>
+          <button className={styles.fabButton} onClick={() => router.push('/dashboard/agenda')}>
             <Plus size={32} strokeWidth={2.5} />
           </button>
         </div>
