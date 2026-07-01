@@ -188,7 +188,7 @@ export default function DashboardPage() {
             <div className={styles.agendaList}>
               {todaysAppointments.length > 0 ? todaysAppointments.map(appt => (
                 <div key={appt.id} className={styles.agendaItem}>
-                  <div className={styles.agendaTime}>{new Date(appt.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} <div className={`${styles.agendaDot} ${styles.dotGreen}`}></div></div>
+                  <div className={styles.agendaTime}>{`${String(new Date(appt.date).getUTCHours()).padStart(2, '0')}:${String(new Date(appt.date).getUTCMinutes()).padStart(2, '0')}`} <div className={`${styles.agendaDot} ${styles.dotGreen}`}></div></div>
                   <div className={styles.agendaClient}>
                     <div className={styles.agendaAvatar}><img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(appt.client?.name || 'Cliente')}&background=random`} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} /></div>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -257,7 +257,7 @@ export default function DashboardPage() {
                     <span className={styles.clientName}>{nextAppointment.client?.name || 'Cliente'}</span>
                     <span className={styles.clientService}>{services.find(s=>s.id===nextAppointment.serviceId)?.name || 'Serviço'}</span>
                     <span className={styles.clientTime}>
-                      <CalendarDays size={12} /> {new Date(nextAppointment.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} • 40 minutos
+                      <CalendarDays size={12} /> {`${String(new Date(nextAppointment.date).getUTCHours()).padStart(2, '0')}:${String(new Date(nextAppointment.date).getUTCMinutes()).padStart(2, '0')}`} • 40 minutos
                     </span>
                   </div>
                 </div>

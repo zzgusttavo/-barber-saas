@@ -145,7 +145,7 @@ export default function AgendaPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, color: '#18181b' }}>
                     <Clock size={16} color="#71717a" />
-                    {new Date(app.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    {`${String(new Date(app.date).getUTCHours()).padStart(2, '0')}:${String(new Date(app.date).getUTCMinutes()).padStart(2, '0')}`}
                   </div>
                   <div style={{ padding: '0.25rem 0.5rem', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700, backgroundColor: app.status === 'completed' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(245, 158, 11, 0.1)', color: app.status === 'completed' ? '#16a34a' : '#d97706' }}>
                     {app.status === 'completed' ? 'FINALIZADO' : 'AGUARDANDO'}

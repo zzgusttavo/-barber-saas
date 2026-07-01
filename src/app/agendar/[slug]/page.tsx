@@ -94,7 +94,7 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
           if (Array.isArray(data)) {
             const booked = data.map(app => {
               const d = new Date(app.date);
-              return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`;
             });
             setBookedTimes(booked);
           }
