@@ -318,7 +318,7 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
                   type="text" 
                   value={clientLoginData.whatsapp}
                   onChange={(e) => setClientLoginData({...clientLoginData, whatsapp: e.target.value})}
-                  className={styles.modalInput}
+                  className={styles.inputField}
                   placeholder="(00) 00000-0000"
                   required
                 />
@@ -329,7 +329,7 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
                   type="password" 
                   value={clientLoginData.password}
                   onChange={(e) => setClientLoginData({...clientLoginData, password: e.target.value})}
-                  className={styles.modalInput}
+                  className={styles.inputField}
                   placeholder="Sua senha"
                   required
                 />
