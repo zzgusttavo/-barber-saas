@@ -176,7 +176,7 @@ export async function POST(request: Request) {
       const targetWhatsapp = client.whatsapp || whatsapp;
       console.log(`[WHATSAPP] Disparando mensagem para ${targetWhatsapp}: ${msgText}`);
 
-      fetch('https://modern-swan-16.loca.lt/send', {
+      fetch('https://gustavo-barber-bot-prod-1.loca.lt/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Bypass-Tunnel-Reminder': 'true' },
         body: JSON.stringify({ number: targetWhatsapp, message: msgText })
