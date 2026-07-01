@@ -155,3 +155,12 @@
   justify-content: flex-end;
   gap: 1rem;
 }
+
+@media (max-width: 640px) {
+  .actions {
+    flex-direction: column-reverse;
+  }
+  .actions button {
+    width: 100%;
+  }
+}
