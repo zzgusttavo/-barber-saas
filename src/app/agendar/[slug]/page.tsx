@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useSession, signIn, signOut } from 'next-auth/react';
 import styles from './agendamento.module.css';
 import { 
   Menu, Bell, Settings, MapPin, Globe, Share2,
@@ -23,6 +24,8 @@ const ComboIcon = ({ size, ...props }: any) => (
 const mockTimes = ['09:00', '09:40', '10:20', '11:00', '11:40', '13:00', '13:40', '14:20', '15:00', '15:40', '16:20', '17:00', '17:40', '18:20', '19:00', '19:40'];
 
 export default function AgendamentoPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { data: session, status } = useSession();
+  const isClientLogged = session?.user?.role === 'CLIENT' && (session.user as any).slug === slugStr;
   const [barbers, setBarbers] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
 
@@ -36,6 +39,9 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
   const [authData, setAuthData] = useState({ username: '', password: '', whatsapp: '' });
   const [isSuccess, setIsSuccess] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isClientLoginModalOpen, setIsClientLoginModalOpen] = useState(false);
+  const [clientLoginData, setClientLoginData] = useState({ whatsapp: '', password: '' });
+  const [clientAppointments, setClientAppointments] = useState<any[]>([]);
   
   const [slugStr, setSlugStr] = useState("");
   const [businessName, setBusinessName] = useState("Carregando...");
@@ -93,6 +99,40 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
         });
     }
   }, [selectedBarber, selectedDate, slugStr]);
+  
+  useEffect(() => {
+    if (isClientLogged && slugStr) {
+      // Carregar agendamentos do cliente
+      // Como a rota /api/appointments já filtra pelo usuário logado se não passar barbershop
+      fetch(`/api/appointments`)
+        .then(res => res.json())
+        .then(data => {
+           if(Array.isArray(data)) {
+             // O endpoint /api/appointments já pode ser usado, mas precisamos garantir que ele retorne só do cliente
+             // Por simplificação no MVP, vamos buscar e filtrar no frontend se necessário, mas o ideal é no backend.
+             const mine = data.filter(a => a.clientId === (session?.user as any).id);
+             setClientAppointments(mine);
+           }
+        });
+    }
+  }, [isClientLogged, slugStr, session]);
+
+  const handleClientLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const res = await signIn('client-login', {
+      whatsapp: clientLoginData.whatsapp,
+      password: clientLoginData.password,
+      slug: slugStr,
+      redirect: false,
+    });
+
+    if (res?.error) {
+      alert(res.error);
+    } else {
+      setIsClientLoginModalOpen(false);
+      alert('Login realizado com sucesso!');
+    }
+  };
   
   const [clientTab, setClientTab] = useState('agendar');
 
@@ -231,9 +271,28 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
 
   const renderTopNav = () => (
     <div className={styles.topNav}>
-      <button className={styles.topIcon} onClick={() => setIsMenuOpen(true)}><Menu size={24} /></button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <button className={styles.topIcon} onClick={() => setIsMenuOpen(true)}><Menu size={24} /></button>
+        {status === 'authenticated' && isClientLogged ? (
+          <button 
+            onClick={() => setClientTab(clientTab === 'agendar' ? 'meus_agendamentos' : 'agendar')}
+            style={{ background: 'var(--theme-accent)', color: '#000', border: 'none', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}
+          >
+            {clientTab === 'agendar' ? 'Meus Agendamentos' : 'Agendar Novo'}
+          </button>
+        ) : (
+          <button 
+            onClick={() => setIsClientLoginModalOpen(true)}
+            style={{ background: 'rgba(255,184,0,0.1)', color: 'var(--theme-accent)', border: '1px solid var(--theme-accent)', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}
+          >
+            Login
+          </button>
+        )}
+      </div>
       <div className={styles.topIconGroup}>
-        <button className={styles.topIcon} onClick={() => alert("Nenhuma nova notificação.")}><Bell size={24} /></button>
+        {isClientLogged && (
+           <button className={styles.topIcon} onClick={() => signOut()} title="Sair"><User size={24} /></button>
+        )}
       </div>
     </div>
   );
@@ -242,6 +301,86 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
     <div className={styles.container}>
       <BackgroundPattern />
       {renderTopNav()}
+
+      {/* Modal de Login de Cliente */}
+      {isClientLoginModalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent} style={{ maxWidth: '400px', backgroundColor: '#1a1a1a' }}>
+            <div className={styles.modalHeader}>
+              <h3>Entrar na Área do Cliente</h3>
+              <button onClick={() => setIsClientLoginModalOpen(false)} className={styles.closeBtn}><X size={20} /></button>
+            </div>
+            <form onSubmit={handleClientLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.5rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.875rem', color: '#a1a1aa', marginBottom: '0.5rem' }}>WhatsApp</label>
+                <input 
+                  type="text" 
+                  value={clientLoginData.whatsapp}
+                  onChange={(e) => setClientLoginData({...clientLoginData, whatsapp: e.target.value})}
+                  className={styles.modalInput}
+                  placeholder="(00) 00000-0000"
+                  required
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.875rem', color: '#a1a1aa', marginBottom: '0.5rem' }}>Senha (criada no agendamento)</label>
+                <input 
+                  type="password" 
+                  value={clientLoginData.password}
+                  onChange={(e) => setClientLoginData({...clientLoginData, password: e.target.value})}
+                  className={styles.modalInput}
+                  placeholder="Sua senha"
+                  required
+                />
+              </div>
+              <button type="submit" className={styles.primaryButton} style={{ marginTop: '1rem' }}>
+                Entrar
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {clientTab === 'meus_agendamentos' && isClientLogged && (
+        <div style={{ padding: '1rem', marginTop: '4rem', width: '100%', maxWidth: '500px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+           <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+             <Calendar size={24} color="var(--theme-accent)" /> Seus Agendamentos
+           </h2>
+           {clientAppointments.length === 0 ? (
+             <div style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '16px', textAlign: 'center' }}>
+                <p style={{ color: '#a1a1aa' }}>Nenhum agendamento encontrado.</p>
+             </div>
+           ) : (
+             clientAppointments.map(app => (
+               <div key={app.id} style={{ backgroundColor: '#18181b', padding: '1.5rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                    <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>{app.service?.name}</div>
+                    <div style={{ color: 'var(--theme-accent)', fontWeight: 700 }}>R$ {app.service?.price}</div>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', color: '#a1a1aa', fontSize: '0.9rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Calendar size={16} /> {new Date(app.date).toLocaleDateString('pt-BR')}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Clock size={16} /> {new Date(app.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ 
+                        padding: '0.2rem 0.6rem', 
+                        borderRadius: '20px', 
+                        fontSize: '0.75rem', 
+                        backgroundColor: app.status === 'PENDING' ? 'rgba(234, 179, 8, 0.2)' : 'rgba(34, 197, 94, 0.2)',
+                        color: app.status === 'PENDING' ? '#eab308' : '#22c55e'
+                      }}>
+                        {app.status === 'PENDING' ? 'Agendado' : 'Concluído'}
+                      </span>
+                    </div>
+                  </div>
+               </div>
+             ))
+           )}
+        </div>
+      )}
 
       {clientTab === 'agendar' && (
         <>

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import bcrypt from "bcryptjs";
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 const prisma = globalForPrisma.prisma || new PrismaClient();
@@ -100,15 +101,19 @@ export async function POST(request: Request) {
     });
 
     if (!client) {
+      const hashedPassword = await bcrypt.hash(password || whatsapp.substring(whatsapp.length - 4), 10);
       client = await prisma.client.create({
         data: {
           name: clientName,
           username: whatsapp, // usando whatsapp como username para facilitar
           whatsapp,
-          password,
+          password: hashedPassword,
           barbershopId: barbershop.id
         }
       });
+    } else {
+      // Se o cliente já existir mas a senha mandada no agendamento for diferente,
+      // podemos optar por atualizar a senha ou apenas ignorar. Para manter simples, ignoramos.
     }
 
     // 3. Garantir o Serviço
