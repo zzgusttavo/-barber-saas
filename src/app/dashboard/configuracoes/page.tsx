@@ -10,6 +10,9 @@ export default function ConfiguracoesPage() {
   const router = useRouter();
   const [waStatus, setWaStatus] = useState('loading');
   const [waQR, setWaQR] = useState<string | null>(null);
+  const [waPairingCode, setWaPairingCode] = useState<string | null>(null);
+  const [phoneInput, setPhoneInput] = useState('');
+  const [isPairing, setIsPairing] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   
   const ownerName = session?.user?.name || "Proprietário";
@@ -19,7 +22,7 @@ export default function ConfiguracoesPage() {
   useEffect(() => {
     const checkWaStatus = async () => {
       try {
-        const res = await fetch('http://localhost:3005/qr');
+        const res = await fetch('/api/wa-proxy');
         if (res.ok) {
           const data = await res.json();
           setWaStatus(data.status);
@@ -37,6 +40,23 @@ export default function ConfiguracoesPage() {
   const handleCopyLink = () => {
     navigator.clipboard.writeText(`${domainOrigin}/agendar/${slug}`);
     alert('Link copiado!');
+  };
+
+  const requestPairingCode = async () => {
+    if (!phoneInput) return alert('Digite seu número de WhatsApp com DDD');
+    setIsPairing(true);
+    try {
+      const res = await fetch('/api/wa-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phoneInput })
+      });
+      const data = await res.json();
+      if (data.code) setWaPairingCode(data.code);
+    } catch (err) {
+      alert('Erro ao gerar código. O robô está ligado?');
+    }
+    setIsPairing(false);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,12 +115,46 @@ export default function ConfiguracoesPage() {
           </div>
         ) : (
           <div style={{ textAlign: 'center' }}>
-            <p style={{ color: '#71717a', fontSize: '0.875rem', marginBottom: '1rem' }}>Aponte seu WhatsApp para conectar o robô:</p>
-            {waQR ? (
-              <img src={waQR} alt="QR Code" style={{ width: 150, height: 150, borderRadius: '8px' }} />
-            ) : (
-              <div style={{ width: 150, height: 150, border: '1px dashed #d4d4d8', borderRadius: '8px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Gerando...</div>
-            )}
+            <p style={{ color: '#71717a', fontSize: '0.875rem', marginBottom: '1rem' }}>Conecte seu robô pelo QR Code ou pelo seu celular:</p>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', textAlign: 'left' }}>
+              <div style={{ border: '1px solid #e4e4e7', padding: '1.5rem', borderRadius: '12px' }}>
+                <h4 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1rem' }}>Opção 1: Ler QR Code</h4>
+                {waQR ? (
+                  <img src={waQR} alt="QR Code" style={{ width: 150, height: 150, borderRadius: '8px', margin: '0 auto', display: 'block' }} />
+                ) : (
+                  <div style={{ width: 150, height: 150, border: '1px dashed #d4d4d8', borderRadius: '8px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Gerando...</div>
+                )}
+              </div>
+
+              <div style={{ border: '1px solid #e4e4e7', padding: '1.5rem', borderRadius: '12px' }}>
+                <h4 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1rem' }}>Opção 2: Código no Celular</h4>
+                
+                {waPairingCode ? (
+                  <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                     <div style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '4px', color: '#18181b', margin: '1rem 0' }}>{waPairingCode}</div>
+                     <p style={{ fontSize: '0.75rem', color: '#71717a' }}>Abra o WhatsApp &gt; Aparelhos Conectados &gt; Conectar com número de telefone</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' }}>
+                    <input 
+                      type="text" 
+                      placeholder="Ex: 11999999999" 
+                      value={phoneInput} 
+                      onChange={(e) => setPhoneInput(e.target.value)}
+                      style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #e4e4e7', width: '100%', outline: 'none' }}
+                    />
+                    <button 
+                      onClick={requestPairingCode}
+                      disabled={isPairing}
+                      style={{ backgroundColor: '#18181b', color: '#fff', padding: '0.75rem', borderRadius: '8px', border: 'none', fontWeight: 600, cursor: 'pointer', width: '100%' }}
+                    >
+                      {isPairing ? 'Gerando...' : 'Gerar Código (8 letras)'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>

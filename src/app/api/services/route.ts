@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 const prisma = globalForPrisma.prisma || new PrismaClient();
@@ -19,7 +20,7 @@ export async function GET(request: Request) {
       if (shop) targetBarbershopId = shop.id;
     } else {
       // Barbeiro acessando o painel
-      const session = await getServerSession();
+      const session = await getServerSession(authOptions);
       if (session && session.user) {
         targetBarbershopId = (session.user as any).barbershopId;
       }
@@ -43,7 +44,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
@@ -69,7 +70,7 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
