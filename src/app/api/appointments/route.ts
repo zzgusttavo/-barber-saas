@@ -153,7 +153,7 @@ export async function POST(request: Request) {
       
       console.log(`[WHATSAPP] Disparando mensagem para ${whatsapp}: ${msgText}`);
 
-      fetch('http://localhost:3005/send', {
+      fetch('https://loud-eggs-serve.loca.lt/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ number: whatsapp, message: msgText })

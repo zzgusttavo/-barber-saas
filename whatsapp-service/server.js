@@ -2,10 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const qrcode = require('qrcode');
 const pino = require('pino');
-const { default: makeWASocket, DisconnectReason } = require('@whiskeysockets/baileys');
-const { usePostgresAuthState, clearPostgresAuthState } = require('./usePostgresAuthState');
+const { default: makeWASocket, DisconnectReason, useMultiFileAuthState } = require('@whiskeysockets/baileys');
 const path = require('path');
 const fs = require('fs');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 const app = express();
 app.use(cors());
@@ -19,7 +20,7 @@ let currentPairingCode = null;
 let isConnected = false;
 
 async function connectToWhatsApp() {
-    const { state, saveCreds } = await usePostgresAuthState('default');
+    const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
 
     sock = makeWASocket({
         auth: state,
@@ -44,8 +45,8 @@ async function connectToWhatsApp() {
             if (shouldReconnect) {
                 connectToWhatsApp();
             } else {
-                console.log('[WHATSAPP] Desconectado. Apagando sessão do Postgres...');
-                await clearPostgresAuthState('default');
+                console.log('[WHATSAPP] Desconectado. Apagando sessão local...');
+                fs.rmSync('auth_info_baileys', { recursive: true, force: true });
                 currentQR = null;
                 connectToWhatsApp();
             }
@@ -76,7 +77,23 @@ async function connectToWhatsApp() {
             await sock.sendPresenceUpdate('composing', sender);
             
             setTimeout(async () => {
-                const link = "http://localhost:3000/agendar/teste";
+                // Descobrir qual barbearia é dona deste robô
+                let myJid = sock.user.id.split(':')[0].split('@')[0];
+                if (myJid.startsWith('55')) myJid = myJid.substring(2); // tira o 55
+                
+                // Pega todas as barbearias e acha a que o telefone bate
+                const shops = await prisma.barbershop.findMany();
+                let foundSlug = shops.length > 0 ? shops[0].slug : "sua-barbearia"; // fallback real
+                
+                for (const b of shops) {
+                    const cleanDbPhone = b.phone?.replace(/[^0-9]/g, '');
+                    if (cleanDbPhone && (cleanDbPhone === myJid || cleanDbPhone.includes(myJid.substring(2)))) {
+                        foundSlug = b.slug;
+                        break;
+                    }
+                }
+
+                const link = `https://barber-saas-alpha.vercel.app/agendar/${foundSlug}`;
                 const reply = `Olá ${pushName}! ✂️\n\nPara agendar seu horário, é só clicar no link abaixo de forma rápida e automática:\n👉 ${link}\n\nFicamos no aguardo!`;
                 await sock.sendMessage(sender, { text: reply });
                 await sock.sendPresenceUpdate('paused', sender);
@@ -133,7 +150,10 @@ app.post('/send', async (req, res) => {
     try {
         const { number, message } = req.body;
         // Format number to JID (5511999999999@s.whatsapp.net)
-        const cleanPhone = number.replace(/[^0-9]/g, '');
+        let cleanPhone = number.replace(/[^0-9]/g, '');
+        if (cleanPhone.length === 10 || cleanPhone.length === 11) {
+            cleanPhone = '55' + cleanPhone;
+        }
         const jid = `${cleanPhone}@s.whatsapp.net`;
         
         console.log(`[WHATSAPP] Disparando mensagem automática para ${jid}`);

@@ -195,7 +195,9 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
   if (isSuccess) {
     const serviceName = selectedService ? services.find(s => s.id === selectedService)?.name : 'Corte';
     const message = encodeURIComponent(`Olá! Acabei de fazer um agendamento pelo app.\n\n✂️ Serviço: ${serviceName}\n📅 Data: ${selectedDate} às ${selectedTime}\n👤 Cliente: ${authData.username}`);
-    const whatsappLink = `https://wa.me/5511999999999?text=${message}`;
+    const shopPhone = barbershop?.phone || '5562998430017'; // Fallback para o dono caso não tenha no DB
+    const cleanShopPhone = shopPhone.replace(/[^0-9]/g, '');
+    const whatsappLink = `https://wa.me/${cleanShopPhone}?text=${message}`;
 
     return (
       <div className={styles.container} style={{ justifyContent: 'center', alignItems: 'center', padding: '2rem' }}>
@@ -252,7 +254,7 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
 
         <div className={styles.socialRow}>
           <a 
-            href="https://wa.me/5511999999999"
+            href={`https://wa.me/${barbershop?.phone?.replace(/[^0-9]/g, '') || '5562998430017'}`}
             target="_blank"
             rel="noopener noreferrer"
             className={styles.socialBtn} 
