@@ -84,7 +84,7 @@ export default function DashboardPage() {
     }, 0);
 
   const monthAppointments = appointments.filter(a => a.dateObj.getMonth() === new Date().getMonth());
-  const uniqueClientsMonth = new Set(monthAppointments.map(a => a.customerName)).size;
+  const uniqueClientsMonth = new Set(monthAppointments.map(a => a.client?.name || 'Cliente')).size;
   
   const formatCurrency = (val: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
@@ -190,9 +190,9 @@ export default function DashboardPage() {
                 <div key={appt.id} className={styles.agendaItem}>
                   <div className={styles.agendaTime}>{new Date(appt.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} <div className={`${styles.agendaDot} ${styles.dotGreen}`}></div></div>
                   <div className={styles.agendaClient}>
-                    <div className={styles.agendaAvatar}><img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(appt.customerName)}&background=random`} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} /></div>
+                    <div className={styles.agendaAvatar}><img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(appt.client?.name || 'Cliente')}&background=random`} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} /></div>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <span className={styles.agendaClientName}>{appt.customerName}</span>
+                      <span className={styles.agendaClientName}>{appt.client?.name || 'Cliente'}</span>
                       <span className={styles.agendaClientService}>{services.find(s=>s.id===appt.serviceId)?.name || 'Serviço'}</span>
                     </div>
                   </div>
@@ -221,9 +221,9 @@ export default function DashboardPage() {
               return (
                 <div key={appt.id} className={styles.recentClientRow}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', overflow: 'hidden', minWidth: '120px' }}>
-                    <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(appt.customerName)}&background=random`} alt="Avatar" className={styles.recentAvatar} />
+                    <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(appt.client?.name || 'Cliente')}&background=random`} alt="Avatar" className={styles.recentAvatar} />
                     <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                      <span className={styles.recentName} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{appt.customerName.split(" ")[0]}</span>
+                      <span className={styles.recentName} style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{(appt.client?.name || 'Cliente').split(" ")[0]}</span>
                     </div>
                   </div>
                   <span className={styles.recentService} style={{ flex: 1, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', marginLeft: '1rem' }}>{srv?.name}</span>
@@ -251,10 +251,10 @@ export default function DashboardPage() {
               <div className={styles.nextApptCard}>
                 <div className={styles.nextApptInfo}>
                   <div className={styles.clientAvatarLarge}>
-                    <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(nextAppointment.customerName)}&background=random`} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                    <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(nextAppointment.client?.name || 'Cliente')}&background=random`} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                   </div>
                   <div className={styles.clientDetails}>
-                    <span className={styles.clientName}>{nextAppointment.customerName}</span>
+                    <span className={styles.clientName}>{nextAppointment.client?.name || 'Cliente'}</span>
                     <span className={styles.clientService}>{services.find(s=>s.id===nextAppointment.serviceId)?.name || 'Serviço'}</span>
                     <span className={styles.clientTime}>
                       <CalendarDays size={12} /> {new Date(nextAppointment.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} • 40 minutos
