@@ -5,7 +5,7 @@ import styles from './barbeiro.module.css';
 import { 
   User, Clock, CheckCircle2, Menu,
   Calendar, Wallet, Settings, Link, Camera, Scissors, Trash2, Share2,
-  CreditCard, ShieldCheck, Zap, AlertTriangle, X
+  CreditCard, ShieldCheck, Zap, AlertTriangle, X, ChevronLeft, ChevronRight, CalendarClock
 } from 'lucide-react';
 import { useSession } from "next-auth/react";
 
@@ -390,49 +390,69 @@ export default function AppDonoPage() {
         </div>
 
         <div className={styles.earningsCard}>
+          <Calendar size={120} className={styles.earningsIconBg} />
           <span className={styles.earningsTitle}>Faturamento de Hoje</span>
           <span className={styles.earningsValue}>{formatCurrency(totalEarningsToday)}</span>
+          <span className={styles.earningsSubtitle}>
+            Atualizado em tempo real • Ao vivo
+          </span>
         </div>
       
       {activeTab === 'agenda' && (
         <>
-          <div style={{ marginBottom: '1rem' }}>
-            <label style={{ fontSize: '0.875rem', color: 'var(--theme-text-muted)', marginBottom: '0.5rem', display: 'block' }}>Filtrar por Profissional:</label>
-            <select 
-              value={filterBarberId} 
-              onChange={(e) => setFilterBarberId(e.target.value)}
-              className={styles.inputField}
-              style={{ backgroundColor: 'var(--theme-card)' }}
-            >
-              <option value="all">Todos os Profissionais</option>
-              {team.map(b => (
-                <option key={b.id} value={b.id}>{b.name}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className={styles.dateFilter}>
-            {nextDays.map((d, i) => (
-              <div 
-                key={i} 
-                className={`${styles.datePill} ${d.fullDateStr === selectedFilterDate ? styles.datePillSelected : ''}`}
-                onClick={() => setSelectedFilterDate(d.fullDateStr)}
+          {team.length > 0 && (
+            <div className={styles.whiteFilterBlock}>
+              <label style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--theme-text-muted)', marginBottom: '0.5rem', display: 'block' }}>Filtrar por Profissional</label>
+              <select 
+                value={filterBarberId} 
+                onChange={(e) => setFilterBarberId(e.target.value)}
+                className={styles.inputField}
+                style={{ backgroundColor: 'transparent', border: '1px solid rgba(0,0,0,0.1)', padding: '0.75rem' }}
               >
-                <span className={styles.dateDayName}>{d.dayName}</span>
-                <span className={styles.dateNumber}>{d.dayNumber}</span>
-              </div>
-            ))}
+                <option value="all">Todos os Profissionais</option>
+                {team.map(b => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <div className={styles.carouselBlock}>
+            <button className={styles.carouselArrow}>
+              <ChevronLeft size={20} />
+            </button>
+            <div className={styles.dateFilter}>
+              {nextDays.map((d, i) => (
+                <div 
+                  key={i} 
+                  className={`${styles.datePill} ${d.fullDateStr === selectedFilterDate ? styles.datePillSelected : ''}`}
+                  onClick={() => setSelectedFilterDate(d.fullDateStr)}
+                >
+                  <span className={styles.dateDayName}>{d.dayName}</span>
+                  <span className={styles.dateNumber}>{d.dayNumber}</span>
+                </div>
+              ))}
+            </div>
+            <button className={styles.carouselArrow}>
+              <ChevronRight size={20} />
+            </button>
           </div>
 
           <div className={styles.content}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h2 className={styles.sectionTitle} style={{ margin: 0 }}>Agenda</h2>
+              <h2 className={styles.sectionTitle} style={{ margin: 0, textAlign: 'left', fontSize: '1.25rem' }}>Agenda</h2>
             </div>
 
             <div className={styles.agendaList}>
               {todaysAppointments.length === 0 && (
-                <div style={{ textAlign: 'center', color: 'var(--theme-text-muted)', marginTop: '2rem' }}>
-                  Nenhum agendamento encontrado para o filtro atual.
+                <div className={styles.emptyStateContainer}>
+                  <div className={styles.emptyStateIcon}>
+                    <CalendarClock size={32} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--theme-text-main)', marginBottom: '0.25rem' }}>Nenhum agendamento encontrado</h3>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--theme-text-muted)' }}>Não há agendamentos para o filtro selecionado.</p>
+                  </div>
                 </div>
               )}
               {todaysAppointments.map((app) => (

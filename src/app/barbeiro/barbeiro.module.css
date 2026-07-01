@@ -40,26 +40,84 @@
 .earningsCard {
   margin: 0 1.25rem 1.5rem;
   padding: 1.5rem;
-  background: linear-gradient(135deg, var(--theme-accent) 0%, #d99a00 100%);
-  border-radius: 20px;
-  color: #000;
-  box-shadow: 0 8px 24px rgba(255, 184, 0, 0.2);
+  background: linear-gradient(90deg, #16a34a 0%, #ca8a04 100%);
+  border-radius: 12px;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
+  position: relative;
+  overflow: hidden;
 }
 
 .earningsTitle {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  opacity: 0.8;
+  font-size: 0.875rem;
+  font-weight: 500;
+  opacity: 0.9;
 }
 
 .earningsValue {
-  font-size: 2rem;
+  font-size: 2.25rem;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
+
+.earningsSubtitle {
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0.8;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.earningsIconBg {
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.15;
+}
+
+.whiteFilterBlock {
+  background-color: var(--theme-card);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin: 0 1.25rem 1.5rem;
+  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.carouselBlock {
+  background-color: var(--theme-card);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 0 1.25rem 1.5rem;
+  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.carouselArrow {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--theme-text-muted);
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: color 0.2s;
+}
+
+.carouselArrow:hover {
+  color: var(--theme-text-main);
+}
+
 
 /* --- Gaveta (Drawer Lateral) --- */
 .drawerOverlay {
@@ -149,43 +207,70 @@
 }
 
 .menuItem.active {
-  background-color: rgba(255, 184, 0, 0.1);
-  color: var(--theme-accent);
+  background-color: rgba(22, 163, 74, 0.1);
+  color: #16a34a;
   font-weight: 700;
 }
 
 /* --- Filtro de Datas --- */
 .dateFilter {
-  padding: 0 1.25rem 1.25rem;
   display: flex;
   gap: 0.75rem;
   overflow-x: auto;
   scrollbar-width: none;
+  flex: 1;
 }
 .dateFilter::-webkit-scrollbar { display: none; }
 
 .datePill {
-  min-width: 70px;
+  min-width: 60px;
   padding: 0.75rem 0.5rem;
-  border-radius: 16px;
+  border-radius: 12px;
   background-color: var(--theme-card);
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0,0,0,0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
 .datePillSelected {
-  background-color: var(--theme-accent);
-  color: #000;
-  border-color: var(--theme-accent);
+  background-color: #16a34a;
+  color: #ffffff;
+  border-color: #16a34a;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
 }
 
-.dateDayName { font-size: 0.75rem; opacity: 0.7; font-weight: 600; }
+.dateDayName { font-size: 0.75rem; opacity: 0.9; font-weight: 500; }
 .dateNumber { font-size: 1.25rem; font-weight: 700; margin-top: 0.25rem; }
+
+/* --- Empty State --- */
+.emptyStateContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  background-color: var(--theme-card);
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.05);
+  text-align: center;
+  gap: 1rem;
+}
+
+.emptyStateIcon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: rgba(22, 163, 74, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #16a34a;
+}
 
 /* --- Conteúdo Base --- */
 .content {
@@ -429,7 +514,19 @@
   }
 
   .earningsCard {
-    margin: 2.5rem auto 1.5rem auto;
+    margin: 1.5rem auto;
+    width: calc(100% - 5rem);
+    max-width: 1060px;
+  }
+
+  .whiteFilterBlock {
+    margin: 0 auto 1.5rem auto;
+    width: calc(100% - 5rem);
+    max-width: 1060px;
+  }
+
+  .carouselBlock {
+    margin: 0 auto 1.5rem auto;
     width: calc(100% - 5rem);
     max-width: 1060px;
   }
