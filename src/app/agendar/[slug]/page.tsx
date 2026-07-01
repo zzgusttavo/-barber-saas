@@ -5,7 +5,7 @@ import { useSession, signIn, signOut } from 'next-auth/react';
 import styles from './agendamento.module.css';
 import { 
   Menu, Bell, Settings, MapPin, Globe, Share2,
-  Scissors, User, CheckCircle2, Phone, ChevronLeft, ChevronRight, X, Sun, Moon, Camera, Key, Check, Star, Trophy, Calendar, Clock, ArrowRight
+  Scissors, User, CheckCircle2, Phone, ChevronLeft, ChevronRight, X, Sun, Moon, Camera, Key, Check, Star, Trophy, Calendar, Clock, ArrowRight, LogOut
 } from 'lucide-react';
 
 const MustacheIcon = ({ size, color, style, ...props }: any) => (
@@ -25,7 +25,6 @@ const mockTimes = ['09:00', '09:40', '10:20', '11:00', '11:40', '13:00', '13:40'
 
 export default function AgendamentoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { data: session, status } = useSession();
-  const isClientLogged = (session?.user as any)?.role === 'CLIENT' && (session?.user as any)?.slug === slugStr;
   const [barbers, setBarbers] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
 
@@ -46,6 +45,7 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
   const [slugStr, setSlugStr] = useState("");
   const [businessName, setBusinessName] = useState("Carregando...");
   const [businessPhone, setBusinessPhone] = useState("5562998430017");
+  const isClientLogged = (session?.user as any)?.role === 'CLIENT' && (session?.user as any)?.slug === slugStr;
   
   useEffect(() => {
     params.then(p => {
@@ -714,15 +714,27 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
                 <span>Agendar Horário</span>
               </button>
 
-              <button className={styles.drawerItem} onClick={() => { setClientTab('perfil'); setIsMenuOpen(false); }}>
-                <User size={20} className={styles.drawerItemIcon} />
-                <span>Meu Perfil</span>
-              </button>
-
-              <button className={styles.drawerItem} onClick={() => { setClientTab('config'); setIsMenuOpen(false); }}>
-                <Settings size={20} className={styles.drawerItemIcon} />
-                <span>Configurações</span>
-              </button>
+              {status === 'authenticated' && isClientLogged ? (
+                <>
+                  <button className={styles.drawerItem} onClick={() => { setClientTab('meus_agendamentos'); setIsMenuOpen(false); }}>
+                    <Calendar size={20} className={styles.drawerItemIcon} />
+                    <span>Meus Agendamentos</span>
+                  </button>
+                  <button className={styles.drawerItem} onClick={() => { setClientTab('perfil'); setIsMenuOpen(false); }}>
+                    <User size={20} className={styles.drawerItemIcon} />
+                    <span>Meu Perfil</span>
+                  </button>
+                  <button className={styles.drawerItem} onClick={() => { signOut(); setIsMenuOpen(false); }}>
+                    <LogOut size={20} className={styles.drawerItemIcon} />
+                    <span>Sair</span>
+                  </button>
+                </>
+              ) : (
+                <button className={styles.drawerItem} onClick={() => { setIsClientLoginModalOpen(true); setIsMenuOpen(false); }}>
+                  <User size={20} className={styles.drawerItemIcon} />
+                  <span>Login / Entrar</span>
+                </button>
+              )}
             </div>
           </div>
         </>
