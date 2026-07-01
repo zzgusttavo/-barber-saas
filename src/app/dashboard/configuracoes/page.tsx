@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Settings, CheckCircle2, Share2, Link as LinkIcon, Camera, Copy, LogOut, Plus, UserCog, ChevronRight } from 'lucide-react';
+import { Settings, CheckCircle2, Share2, Link as LinkIcon, Camera, Copy, LogOut, Plus, UserCog, ChevronRight, Crown } from 'lucide-react';
 
 export default function ConfiguracoesPage() {
   const { data: session, status } = useSession();
@@ -88,6 +88,17 @@ export default function ConfiguracoesPage() {
         </label>
         <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>{ownerName}</h2>
         <span style={{ color: '#71717a', fontSize: '0.875rem' }}>Proprietário</span>
+      </div>
+
+      <div style={{ backgroundColor: '#fff', borderRadius: '16px', padding: '1.5rem', marginBottom: '1rem', border: '1px solid rgba(0,0,0,0.02)', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
+        <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Crown size={18} color="#16a34a" /> Minha Assinatura
+        </h3>
+        <p style={{ color: '#71717a', fontSize: '0.875rem', marginBottom: '1rem' }}>Gerencie seu plano atual, renovação e cobranças.</p>
+        
+        <button onClick={() => router.push('/dashboard/assinatura')} style={{ width: '100%', backgroundColor: '#f4f4f5', color: '#18181b', padding: '1rem', borderRadius: '8px', border: 'none', fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+          Gerenciar Assinatura <ChevronRight size={16} color="#71717a" />
+        </button>
       </div>
 
       <div style={{ backgroundColor: '#fff', borderRadius: '16px', padding: '1.5rem', marginBottom: '1rem', border: '1px solid rgba(0,0,0,0.02)', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
