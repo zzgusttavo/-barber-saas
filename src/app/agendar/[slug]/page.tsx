@@ -155,12 +155,21 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
 
   const handleOpenAuth = () => {
     if (isFormComplete) {
-      setIsAuthModalOpen(true);
+      if (status === 'authenticated' && isClientLogged) {
+        handleRegisterAndBook();
+      } else {
+        setIsAuthModalOpen(true);
+      }
     }
   };
 
   const handleRegisterAndBook = async () => {
-    if (authData.username && authData.password && authData.whatsapp) {
+    const isLogged = status === 'authenticated' && isClientLogged;
+    const finalUsername = isLogged ? (session?.user as any)?.name : authData.username;
+    const finalWhatsapp = isLogged ? (session?.user as any)?.whatsapp : authData.whatsapp;
+    const finalPassword = isLogged ? 'senha_oculta' : authData.password;
+
+    if (finalUsername && finalWhatsapp && finalPassword) {
       try {
         const response = await fetch('/api/appointments', {
           method: 'POST',
@@ -168,9 +177,9 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
           body: JSON.stringify({
             slug: slugStr,
             barberId: selectedBarber,
-            clientName: authData.username,
-            whatsapp: authData.whatsapp,
-            password: authData.password,
+            clientName: finalUsername,
+            whatsapp: finalWhatsapp,
+            password: finalPassword,
             date: selectedDate,
             time: selectedTime,
             serviceName: selectedService ? services.find(s => s.id === selectedService)?.name : 'Corte Padrão',
