@@ -107,11 +107,11 @@ export default function AssinaturaPage() {
             )}
           </div>
 
-          <div className={styles.actions}>
-            <Button variant="ghost" style={{ color: 'var(--danger-color)' }} onClick={() => alert('Para cancelar, acesse a área de assinaturas do Mercado Pago.')}>
+          <div className={`${styles.actions} flex flex-col-reverse sm:flex-row w-full gap-4`}>
+            <Button variant="ghost" style={{ color: 'var(--danger-color)' }} className="w-full sm:w-auto" onClick={() => alert('Para cancelar, acesse a área de assinaturas do Mercado Pago.')}>
               Cancelar Assinatura
             </Button>
-            <Button variant="accent" onClick={() => window.open('https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=2c9380848f956c86018f99e46a7d0139', '_blank')}>
+            <Button variant="accent" className="w-full sm:w-auto" onClick={() => window.open('https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=2c9380848f956c86018f99e46a7d0139', '_blank')}>
               Gerenciar no Mercado Pago
             </Button>
           </div>
