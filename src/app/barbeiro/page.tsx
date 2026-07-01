@@ -394,7 +394,7 @@ export default function AppDonoPage() {
           <span className={styles.earningsTitle}>Faturamento de Hoje</span>
           <span className={styles.earningsValue}>{formatCurrency(totalEarningsToday)}</span>
           <span className={styles.earningsSubtitle}>
-            Atualizado em tempo real • Ao vivo
+            Atualizado em tempo real <span className={styles.liveBadge}>• Ao vivo</span>
           </span>
         </div>
       
@@ -439,8 +439,9 @@ export default function AppDonoPage() {
           </div>
 
           <div className={styles.content}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <div className={styles.agendaTitleContainer}>
               <h2 className={styles.sectionTitle} style={{ margin: 0, textAlign: 'left', fontSize: '1.25rem' }}>Agenda</h2>
+              <div className={styles.agendaTitleUnderline}></div>
             </div>
 
             <div className={styles.agendaList}>
