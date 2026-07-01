@@ -1,144 +1,130 @@
 'use client';
 
-import React, { useState } from 'react';
-import styles from '../profissionais/page.module.css'; // Reusing the same table styles
-import { Card, CardContent } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Modal } from '@/components/ui/Modal';
-import { Plus, Edit2, Trash2, Tag } from 'lucide-react';
-
-const initialServices = [
-  { id: '1', name: 'Corte Degradê', price: 45, duration: 40 },
-  { id: '2', name: 'Barba Terapia', price: 35, duration: 30 },
-  { id: '3', name: 'Combo (Corte + Barba)', price: 70, duration: 70 },
-  { id: '4', name: 'Pigmentação', price: 25, duration: 20 },
-];
+import React, { useState, useEffect } from 'react';
+import { Scissors, Trash2, Plus, Edit2 } from 'lucide-react';
 
 export default function ServicosPage() {
-  const [services, setServices] = useState(initialServices);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: '', price: '', duration: '' });
+  const [services, setServices] = useState<any[]>([]);
+  const [newService, setNewService] = useState({ name: '', price: '' });
+  const [isAdding, setIsAdding] = useState(false);
 
-  const handleAddService = () => {
-    if (formData.name && formData.price) {
-      setServices([
-        ...services,
-        {
-          id: Math.random().toString(),
-          name: formData.name,
-          price: parseFloat(formData.price),
-          duration: parseInt(formData.duration) || 30
-        }
-      ]);
-      setIsModalOpen(false);
-      setFormData({ name: '', price: '', duration: '' });
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const res = await fetch('/api/services');
+        const data = await res.json();
+        if(Array.isArray(data)) setServices(data);
+      } catch(e) {
+        console.error("Failed to load services", e);
+      }
+    };
+    loadData();
+  }, []);
+
+  const handleAddService = async () => {
+    if (!newService.name || !newService.price) {
+      return alert('Preencha nome e valor do serviço.');
+    }
+    try {
+      const priceVal = parseFloat(newService.price.replace(',', '.'));
+      const res = await fetch('/api/services', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newService.name, price: priceVal, duration: 40 })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setServices([...services, data]);
+        setNewService({ name: '', price: '' });
+        setIsAdding(false);
+      } else {
+        alert(data.error || 'Erro ao criar serviço');
+      }
+    } catch (e) {
+      alert('Erro de conexão ao criar serviço');
     }
   };
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  const handleDeleteService = async (id: string) => {
+    if(!confirm("Tem certeza que deseja excluir?")) return;
+    try {
+      const res = await fetch(`/api/services?id=${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setServices(services.filter(s => s.id !== id));
+      }
+    } catch(e) {
+      alert("Erro ao remover serviço.");
+    }
   };
 
+  const formatCurrency = (val: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+
   return (
-    <div>
-      <div className={styles.header}>
-        <div>
-          <h1 className={`${styles.title} text-gradient`}>Serviços</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Gerencie os cortes e os preços da barbearia.</p>
-        </div>
-        <Button variant="accent" onClick={() => setIsModalOpen(true)}>
-          <Plus size={18} /> Novo Serviço
-        </Button>
+    <div style={{ paddingBottom: '2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#18181b', margin: 0 }}>Serviços</h1>
+        <button 
+          onClick={() => setIsAdding(!isAdding)}
+          style={{ backgroundColor: '#16a34a', color: '#fff', border: 'none', borderRadius: '50%', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 10px rgba(22, 163, 74, 0.3)' }}
+        >
+          <Plus size={24} />
+        </button>
       </div>
 
-      <Card glass>
-        <CardContent style={{ padding: 0 }}>
-          <div className={styles.tableContainer}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Nome do Serviço</th>
-                  <th>Duração (Minutos)</th>
-                  <th>Preço</th>
-                  <th style={{ textAlign: 'right' }}>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {services.map((service) => (
-                  <tr key={service.id}>
-                    <td style={{ fontWeight: 500 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <div style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: 'rgba(59, 130, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Tag size={14} color="var(--accent-color)" />
-                        </div>
-                        {service.name}
-                      </div>
-                    </td>
-                    <td>{service.duration} min</td>
-                    <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{formatCurrency(service.price)}</td>
-                    <td>
-                      <div className={styles.actions} style={{ justifyContent: 'flex-end' }}>
-                        <button className={styles.actionButton} aria-label="Editar">
-                          <Edit2 size={16} />
-                        </button>
-                        <button className={styles.actionButton} aria-label="Remover">
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                {services.length === 0 && (
-                  <tr>
-                    <td colSpan={4} style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-tertiary)' }}>
-                      Nenhum serviço cadastrado.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Modal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)}
-        title="Adicionar Serviço"
-      >
-        <div className={styles.formGrid}>
-          <Input 
-            label="Nome do Serviço" 
-            placeholder="Ex: Corte Degradê" 
-            value={formData.name}
-            onChange={(e) => setFormData({...formData, name: e.target.value})}
-            autoFocus
-          />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-            <Input 
-              label="Preço (R$)" 
-              type="number"
-              placeholder="Ex: 45.00" 
-              value={formData.price}
-              onChange={(e) => setFormData({...formData, price: e.target.value})}
+      {isAdding && (
+        <div style={{ backgroundColor: '#fff', padding: '1.5rem', borderRadius: '16px', marginBottom: '1.5rem', border: '1px solid rgba(0,0,0,0.02)', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
+          <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1rem' }}>Novo Serviço</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1rem' }}>
+            <input 
+              placeholder="Ex: Corte Degradê"
+              value={newService.name}
+              onChange={e => setNewService({...newService, name: e.target.value})}
+              style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #e4e4e7', outline: 'none', width: '100%' }}
             />
-            <Input 
-              label="Duração (Minutos)" 
+            <input 
               type="number"
-              placeholder="Ex: 40" 
-              value={formData.duration}
-              onChange={(e) => setFormData({...formData, duration: e.target.value})}
+              placeholder="Valor (R$)"
+              value={newService.price}
+              onChange={e => setNewService({...newService, price: e.target.value})}
+              style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #e4e4e7', outline: 'none', width: '100%' }}
             />
           </div>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button 
+              style={{ flex: 1, backgroundColor: '#f4f4f5', color: '#18181b', padding: '0.75rem', borderRadius: '8px', border: 'none', fontWeight: 600, cursor: 'pointer' }}
+              onClick={() => setIsAdding(false)}
+            >Cancelar</button>
+            <button 
+              style={{ flex: 1, backgroundColor: '#18181b', color: '#fff', padding: '0.75rem', borderRadius: '8px', border: 'none', fontWeight: 600, cursor: 'pointer' }}
+              onClick={handleAddService}
+            >Salvar</button>
+          </div>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
-          <Button variant="ghost" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
-          <Button variant="accent" onClick={handleAddService} disabled={!formData.name || !formData.price}>
-            Salvar Serviço
-          </Button>
-        </div>
-      </Modal>
+      )}
+      
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        {services.length === 0 && !isAdding ? (
+          <div style={{ textAlign: 'center', color: '#71717a', padding: '2rem' }}>
+            <Scissors size={32} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
+            Você ainda não tem serviços cadastrados.
+          </div>
+        ) : (
+          services.map(service => (
+            <div key={service.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fff', padding: '1.25rem', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.02)', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '1.125rem', color: '#18181b', marginBottom: '0.25rem' }}>{service.name}</div>
+                <div style={{ fontWeight: 800, fontSize: '1rem', color: '#16a34a' }}>{formatCurrency(service.price)}</div>
+              </div>
+              <button 
+                style={{ background: 'rgba(239, 68, 68, 0.1)', border: 'none', color: '#ef4444', width: 40, height: 40, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                onClick={() => handleDeleteService(service.id)}
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }
