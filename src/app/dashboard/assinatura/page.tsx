@@ -1,13 +1,34 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './assinatura.module.css';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 
 export default function AssinaturaPage() {
-  const isFirstMonth = true; // Mock: indica se está no período promocional
+  const [subData, setSubData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/subscriptions/status')
+      .then(res => res.json())
+      .then(data => {
+        setSubData(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const isFirstMonth = !subData?.mpSubscriptionId || subData?.mpSubscriptionStatus === 'pending' || (subData?.trialEndsAt && new Date(subData.trialEndsAt) > new Date());
+  const isActive = subData?.mpSubscriptionStatus === 'authorized' || subData?.mpSubscriptionStatus === 'active';
   
+  if (loading) {
+    return <div style={{ padding: '2rem', textAlign: 'center' }}>Carregando dados da assinatura...</div>;
+  }
+
+  const startDate = subData?.createdAt ? new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long' }).format(new Date(subData.createdAt)) : 'Indisponível';
+  const nextBilling = subData?.mpNextBillingDate ? new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long' }).format(new Date(subData.mpNextBillingDate)) : 'Aguardando pagamento';
+
   return (
     <div className={styles.container}>
       <h1 className="text-gradient" style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '2rem' }}>
@@ -20,9 +41,9 @@ export default function AssinaturaPage() {
           <div className={styles.planHeader}>
             <div>
               <h2 className={styles.planTitle}>Plano Profissional</h2>
-              <div className={styles.planStatus}>
+              <div className={styles.planStatus} style={{ color: isActive ? '#16a34a' : (subData?.mpSubscriptionStatus === 'cancelled' ? '#ef4444' : '#eab308'), backgroundColor: isActive ? 'rgba(34,197,94,0.1)' : 'rgba(234,179,8,0.1)' }}>
                 <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'currentColor' }}></span>
-                Ativa
+                {isActive ? 'Ativa' : (subData?.mpSubscriptionStatus === 'cancelled' ? 'Cancelada' : 'Pendente / Trial')}
               </div>
             </div>
 
@@ -75,17 +96,15 @@ export default function AssinaturaPage() {
 
           <div className={styles.billingInfo}>
             <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Início da assinatura</span>
-              <span className={styles.infoValue}>29 de Junho de 2026</span>
+              <span className={styles.infoLabel}>Início da conta</span>
+              <span className={styles.infoValue}>{startDate}</span>
             </div>
-            <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Próxima cobrança</span>
-              <span className={styles.infoValue}>29 de Julho de 2026 (R$ 44,90)</span>
-            </div>
-            <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Forma de pagamento</span>
-              <span className={styles.infoValue}>Cartão final •••• 4242</span>
-            </div>
+            {subData?.mpSubscriptionId && (
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Próxima cobrança</span>
+                <span className={styles.infoValue}>{nextBilling} (R$ 44,90)</span>
+              </div>
+            )}
           </div>
 
           <div className={styles.actions}>

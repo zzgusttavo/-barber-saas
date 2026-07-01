@@ -24,6 +24,13 @@ export default function DashboardPage() {
   const userName = session?.user?.name || "Proprietário";
   const firstName = userName.split(" ")[0];
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return 'Bom dia';
+    if (hour >= 12 && hour < 18) return 'Boa tarde';
+    return 'Boa noite';
+  };
+
   const [appointments, setAppointments] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
   const [barbers, setBarbers] = useState<any[]>([]);
@@ -88,7 +95,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className={styles.headerTop}>
         <div>
-          <h1 className={styles.greeting}>Bom dia, {firstName} 👋</h1>
+          <h1 className={styles.greeting}>{getGreeting()}, {firstName} 👋</h1>
           <div className={styles.dateSub}>
             {new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', weekday: 'long' })}
           </div>

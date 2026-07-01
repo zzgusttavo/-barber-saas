@@ -1,29 +1,39 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/Card';
 import { BarChart3, TrendingUp, Users, Scissors } from 'lucide-react';
 import styles from './relatorios.module.css';
 
 export default function RelatoriosPage() {
   const [periodo, setPeriodo] = useState('mes');
+  const [relatoriosData, setRelatoriosData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Dados mockados
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/relatorios?periodo=${periodo}`)
+      .then(res => res.json())
+      .then(data => {
+        setRelatoriosData(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [periodo]);
+
+  const formatCurrency = (val: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
+
   const kpis = [
-    { titulo: 'Faturamento Bruto', valor: 'R$ 4.250,00', cresc: '+12%', icon: <TrendingUp size={20} color="#16a34a" /> },
-    { titulo: 'Novos Clientes', valor: '24', cresc: '+5%', icon: <Users size={20} color="#3b82f6" /> },
-    { titulo: 'Serviços Feitos', valor: '142', cresc: '+18%', icon: <Scissors size={20} color="#a855f7" /> },
+    { titulo: 'Faturamento Bruto', valor: formatCurrency(relatoriosData?.faturamentoBruto), cresc: '-', icon: <TrendingUp size={20} color="#16a34a" /> },
+    { titulo: 'Novos Clientes', valor: relatoriosData?.novosClientes || 0, cresc: '-', icon: <Users size={20} color="#3b82f6" /> },
+    { titulo: 'Serviços Feitos', valor: relatoriosData?.servicosFeitos || 0, cresc: '-', icon: <Scissors size={20} color="#a855f7" /> },
   ];
 
-  const servicosPopulares = [
-    { nome: 'Corte Social', qtd: 45, percent: 31 },
-    { nome: 'Corte + Barba', qtd: 38, percent: 26 },
-    { nome: 'Degradê', qtd: 35, percent: 24 },
-    { nome: 'Sobrancelha', qtd: 24, percent: 19 },
-  ];
+  const servicosPopulares = relatoriosData?.servicosPopulares || [];
 
   return (
     <div style={{ paddingBottom: '2rem', maxWidth: '800px', margin: '0 auto' }}>
+      {loading && <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: 3, backgroundColor: '#16a34a', zIndex: 50, animation: 'pulse 1.5s infinite' }} />}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#18181b', margin: 0 }}>Relatórios</h1>
         <select 
@@ -62,17 +72,21 @@ export default function RelatoriosPage() {
         </h3>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          {servicosPopulares.map((servico, idx) => (
-            <div key={idx}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', fontWeight: 600, color: '#18181b', marginBottom: '0.5rem' }}>
-                <span>{servico.nome}</span>
-                <span>{servico.qtd} ({servico.percent}%)</span>
+          {servicosPopulares.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '2rem', color: '#71717a' }}>Nenhum serviço registrado neste período.</div>
+          ) : (
+            servicosPopulares.map((servico: any, idx: number) => (
+              <div key={idx}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', fontWeight: 600, color: '#18181b', marginBottom: '0.5rem' }}>
+                  <span>{servico.nome}</span>
+                  <span>{servico.qtd} ({servico.percent}%)</span>
+                </div>
+                <div style={{ width: '100%', height: 8, backgroundColor: '#f4f4f5', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div style={{ width: `${servico.percent}%`, height: '100%', backgroundColor: '#16a34a', borderRadius: '4px' }}></div>
+                </div>
               </div>
-              <div style={{ width: '100%', height: 8, backgroundColor: '#f4f4f5', borderRadius: '4px', overflow: 'hidden' }}>
-                <div style={{ width: `${servico.percent}%`, height: '100%', backgroundColor: '#16a34a', borderRadius: '4px' }}></div>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>
