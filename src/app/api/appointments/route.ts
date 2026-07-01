@@ -100,10 +100,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Nenhum barbeiro disponível' }, { status: 400 });
     }
 
+    const session = await getServerSession(authOptions);
+    const isClientLogged = session?.user && (session.user as any).role === "CLIENT";
+
     // 2. Encontrar ou criar o Cliente
-    let client = await prisma.client.findFirst({
-      where: { whatsapp, barbershopId: barbershop.id }
-    });
+    let client = null;
+    if (isClientLogged && (session.user as any).id) {
+      client = await prisma.client.findUnique({
+        where: { id: (session.user as any).id }
+      });
+    }
+    
+    if (!client) {
+      client = await prisma.client.findFirst({
+        where: { whatsapp, barbershopId: barbershop.id }
+      });
+    }
 
     if (!client) {
       const hashedPassword = await bcrypt.hash(password || whatsapp.substring(whatsapp.length - 4), 10);

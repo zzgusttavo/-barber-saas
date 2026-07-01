@@ -104,6 +104,7 @@ export const authOptions: NextAuthOptions = {
         token.role = (user as any).role;
         token.barbershopId = (user as any).barbershopId;
         token.slug = (user as any).slug;
+        token.whatsapp = (user as any).whatsapp;
       } else if (!token.barbershopId && token.email) {
         // Migração para tokens antigos que não tinham barbershopId e role
         try {
@@ -129,6 +130,7 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).role = token.role;
         (session.user as any).barbershopId = token.barbershopId;
         (session.user as any).slug = token.slug;
+        (session.user as any).whatsapp = token.whatsapp;
       }
       return session;
     }

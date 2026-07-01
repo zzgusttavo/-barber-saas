@@ -165,11 +165,11 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
 
   const handleRegisterAndBook = async () => {
     const isLogged = status === 'authenticated' && isClientLogged;
-    const finalUsername = isLogged ? (session?.user as any)?.name : authData.username;
-    const finalWhatsapp = isLogged ? (session?.user as any)?.whatsapp : authData.whatsapp;
+    const finalUsername = isLogged ? ((session?.user as any)?.name || 'Cliente') : authData.username;
+    const finalWhatsapp = isLogged ? ((session?.user as any)?.whatsapp || '00000000000') : authData.whatsapp;
     const finalPassword = isLogged ? 'senha_oculta' : authData.password;
 
-    if (finalUsername && finalWhatsapp && finalPassword) {
+    if ((isLogged) || (finalUsername && finalWhatsapp && finalPassword)) {
       try {
         const response = await fetch('/api/appointments', {
           method: 'POST',
