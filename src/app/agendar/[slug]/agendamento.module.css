@@ -17,7 +17,7 @@
   display: flex;
   flex-direction: column;
   font-family: 'Outfit', sans-serif;
-  padding-bottom: 8rem;
+  padding-bottom: 2rem;
   background-image: 
     radial-gradient(circle at 15% 50%, rgba(212, 175, 55, 0.03), transparent 25%),
     radial-gradient(circle at 85% 30%, rgba(212, 175, 55, 0.03), transparent 25%);
@@ -415,17 +415,14 @@
 }
 
 .footerActions {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 1rem 1.5rem;
+  padding: 1.5rem;
   background: var(--theme-card);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  z-index: 30;
   border-top: 1px solid var(--theme-border);
+  margin-top: 2rem;
+  border-radius: 16px;
 }
 
 .footerSummary {
