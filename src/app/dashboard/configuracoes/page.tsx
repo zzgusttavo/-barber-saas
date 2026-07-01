@@ -117,7 +117,7 @@ export default function ConfiguracoesPage() {
           <div style={{ textAlign: 'center' }}>
             <p style={{ color: '#71717a', fontSize: '0.875rem', marginBottom: '1rem' }}>Conecte seu robô pelo QR Code ou pelo seu celular:</p>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', textAlign: 'left' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'left' }}>
               <div style={{ border: '1px solid #e4e4e7', padding: '1.5rem', borderRadius: '12px' }}>
                 <h4 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1rem' }}>Opção 1: Ler QR Code</h4>
                 {waQR ? (

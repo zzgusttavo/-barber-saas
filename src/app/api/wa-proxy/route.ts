@@ -2,7 +2,9 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
   try {
-    const res = await fetch('http://127.0.0.1:3005/qr');
+    const res = await fetch('https://strong-moons-yell.loca.lt/qr', {
+      headers: { 'Bypass-Tunnel-Reminder': 'true' }
+    });
     const data = await res.json();
     return NextResponse.json(data);
   } catch (error) {
@@ -13,9 +15,9 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const res = await fetch('http://127.0.0.1:3005/pair', {
+    const res = await fetch('https://strong-moons-yell.loca.lt/pair', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Bypass-Tunnel-Reminder': 'true' },
       body: JSON.stringify(body)
     });
     const data = await res.json();
