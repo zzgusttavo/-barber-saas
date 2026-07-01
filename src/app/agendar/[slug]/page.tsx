@@ -45,6 +45,7 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
   
   const [slugStr, setSlugStr] = useState("");
   const [businessName, setBusinessName] = useState("Carregando...");
+  const [businessPhone, setBusinessPhone] = useState("5562998430017");
   
   useEffect(() => {
     params.then(p => {
@@ -57,6 +58,7 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
             setBusinessName("Barbearia não encontrada");
           } else {
             setBusinessName(data.name);
+            if (data.phone) setBusinessPhone(data.phone);
           }
         })
         .catch(() => {
@@ -235,8 +237,7 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
   if (isSuccess) {
     const serviceName = selectedService ? services.find(s => s.id === selectedService)?.name : 'Corte';
     const message = encodeURIComponent(`Olá! Acabei de fazer um agendamento pelo app.\n\n✂️ Serviço: ${serviceName}\n📅 Data: ${selectedDate} às ${selectedTime}\n👤 Cliente: ${authData.username}`);
-    const shopPhone = barbershop?.phone || '5562998430017'; // Fallback para o dono caso não tenha no DB
-    const cleanShopPhone = shopPhone.replace(/[^0-9]/g, '');
+    const cleanShopPhone = businessPhone.replace(/[^0-9]/g, '');
     const whatsappLink = `https://wa.me/${cleanShopPhone}?text=${message}`;
 
     return (
@@ -393,7 +394,7 @@ export default function AgendamentoPage({ params }: { params: Promise<{ slug: st
 
         <div className={styles.socialRow}>
           <a 
-            href={`https://wa.me/${barbershop?.phone?.replace(/[^0-9]/g, '') || '5562998430017'}`}
+            href={`https://wa.me/${businessPhone.replace(/[^0-9]/g, '')}`}
             target="_blank"
             rel="noopener noreferrer"
             className={styles.socialBtn} 
