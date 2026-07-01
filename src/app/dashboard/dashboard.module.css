@@ -1,146 +1,363 @@
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  margin-bottom: 4rem;
-}
-
-.metricCard {
+.dashboardContainer {
   display: flex;
   flex-direction: column;
+  gap: 2rem;
+  padding-bottom: 2rem;
 }
 
-.metricHeader {
+/* Header Sec */
+.headerTop {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
 }
 
-.metricTitle {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.metricIcon {
-  color: var(--text-primary);
-}
-
-.metricValue {
-  font-size: 3rem; /* Enorme e luxuoso */
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.04em;
-  line-height: 1;
-  margin-bottom: 0.75rem;
-}
-
-.metricSubtext {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 500;
-}
-
-.sectionTitle {
+.greeting {
   font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 2rem;
+  font-weight: 800;
+  color: #18181b;
+  margin: 0 0 0.25rem 0;
   letter-spacing: -0.03em;
 }
 
-.appointmentsList {
+.dateSub {
+  font-size: 0.875rem;
+  color: #71717a;
+  font-weight: 500;
+}
+
+.headerActions {
   display: flex;
-  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.bellButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 1px solid rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #18181b;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #d1d5db;
+  position: relative;
+}
+.avatar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background-color: #22c55e;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+}
+
+/* 2x2 KPI Grid */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
 
-.appointmentItem {
+.kpiCard {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+  border: 1px solid rgba(0,0,0,0.02);
+}
+
+.kpiTop {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.kpiIconWrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kpiTitle {
+  font-size: 0.75rem;
+  color: #71717a;
+  font-weight: 600;
+}
+
+.kpiValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #18181b;
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+
+.kpiBottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.kpiBadge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Section Titles */
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: #18181b;
+  letter-spacing: -0.02em;
+}
+
+.sectionLink {
+  font-size: 0.75rem;
+  color: #71717a;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Próximo Atendimento */
+.nextApptCard {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+  border: 1px solid rgba(0,0,0,0.02);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.5rem;
-  background-color: var(--bg-primary);
-  border: 1px solid transparent;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  transition: all var(--transition-fast);
 }
 
-.appointmentItem:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+.nextApptInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
-.clientInfo {
+.clientAvatarLarge {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #e4e4e7;
+  flex-shrink: 0;
+}
+
+.clientDetails {
   display: flex;
   flex-direction: column;
 }
 
 .clientName {
   font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  color: #18181b;
 }
-
-.serviceInfo {
-  font-size: 0.9375rem;
-  color: var(--text-secondary);
-  margin-top: 0.25rem;
+.clientService {
+  font-size: 0.875rem;
+  color: #71717a;
+  margin-bottom: 0.5rem;
 }
-
-.timeInfo {
-  text-align: right;
-}
-
-.time {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
-}
-
-.status {
-  font-size: 0.8125rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--radius-full);
-  background-color: var(--bg-tertiary);
-  color: var(--text-secondary);
-  font-weight: 600;
-  display: inline-block;
-  margin-top: 0.5rem;
-}
-
-.statusAgora {
-  background-color: var(--text-primary);
-  color: var(--bg-primary);
-}
-
-.viewAllButton {
-  margin-top: 2rem;
-  width: 100%;
-  padding: 1.25rem;
-  background: var(--bg-primary);
-  border: none;
-  border-radius: var(--radius-lg);
-  color: var(--text-primary);
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
+.clientTime {
+  font-size: 0.8rem;
+  color: #71717a;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  box-shadow: var(--shadow-sm);
-  transition: all var(--transition-fast);
+  gap: 0.25rem;
+  font-weight: 500;
 }
 
-.viewAllButton:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
+.statusBadge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.statusConfirmed {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
+
+/* Agenda List */
+.agendaList {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 0.5rem 1.25rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+  border: 1px solid rgba(0,0,0,0.02);
+}
+
+.agendaItem {
+  display: flex;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.agendaItem:last-child {
+  border-bottom: none;
+}
+
+.agendaTime {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #71717a;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.agendaDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.dotGreen { background-color: #22c55e; }
+.dotGrey { background-color: #d4d4d8; }
+
+.agendaClient {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.agendaAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #e4e4e7;
+}
+
+.agendaClientName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #18181b;
+}
+.agendaClientService {
+  font-size: 0.75rem;
+  color: #71717a;
+}
+
+.agendaStatus {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  margin-right: 0.5rem;
+}
+.agendaLivre {
+  color: #22c55e;
+  font-size: 0.95rem;
+}
+
+/* Split Columns */
+.splitCols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.splitCard {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+  border: 1px solid rgba(0,0,0,0.02);
+}
+
+.splitTitle {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #18181b;
+  margin-bottom: 0.75rem;
+}
+
+.recentClientRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+.recentClientRow:last-child {
+  margin-bottom: 0;
+}
+.recentAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+.recentName {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #18181b;
+}
+.recentService {
+  font-size: 0.65rem;
+  color: #71717a;
+}
+.recentPrice {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #71717a;
+}
+
+/* Ações Rápidas */
+.quickActionsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+.quickActionCard {
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+.quickActionTitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #18181b;
 }

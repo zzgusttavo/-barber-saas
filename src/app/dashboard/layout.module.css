@@ -1,99 +1,83 @@
 .layout {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
-  background-color: var(--bg-secondary);
-}
-
-.sidebar {
-  width: 260px;
-  background-color: var(--bg-primary); 
-  border-right: 1px solid var(--border-color); /* Bem sutil */
-  display: flex;
-  flex-direction: column;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  padding: 1.5rem 0;
-}
-
-.logoArea {
-  padding: 0 2rem 2rem;
-}
-
-.logoText {
-  font-size: 1.5rem; /* Maior e mais marcante */
-  font-weight: 800;
-  margin: 0;
-  letter-spacing: -0.04em;
-  color: var(--text-primary);
-}
-
-.nav {
-  padding: 0 1rem;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.navItem {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.9375rem;
-  border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
-}
-
-.navItem:hover {
-  background-color: var(--bg-tertiary); 
-  color: var(--text-primary);
-}
-
-.navItemActive {
-  background-color: var(--text-primary);
-  color: var(--bg-primary);
-}
-.navItemActive:hover {
-  background-color: var(--text-primary); /* Mantém no hover */
-  color: var(--bg-primary);
-}
-
-.footer {
-  padding: 1.5rem;
-  margin: 0 1rem;
-  border-radius: var(--radius-lg);
-  background: var(--bg-tertiary);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+  background-color: #f8f9fa; /* Background super claro do mobile */
+  margin: 0 auto;
+  max-width: 480px; /* Mantendo aspecto mobile nativo */
+  box-shadow: 0 0 40px rgba(0,0,0,0.05);
+  position: relative;
+  overflow-x: hidden;
 }
 
 .main {
   flex: 1;
   display: flex;
   flex-direction: column;
-}
-
-.header {
-  height: 5rem;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 0 3rem;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  padding-bottom: 80px; /* Espaço para a bottom nav */
 }
 
 .content {
-  padding: 0 3rem 3rem;
+  padding: 1.5rem;
   flex: 1;
-  max-width: 1400px;
-  margin: 0 auto;
   width: 100%;
+}
+
+.bottomNav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem 1.5rem; /* Ajuste para notch inferior do iPhone */
+  border-top: 1px solid rgba(0,0,0,0.05);
+  z-index: 50;
+  box-shadow: 0 -10px 20px rgba(0,0,0,0.03);
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  color: #a1a1aa; /* Cinza claro inativo */
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-decoration: none;
+  flex: 1;
+  transition: all 0.2s ease;
+}
+
+.navItemActive {
+  color: #16a34a; /* Verde ativo */
+}
+
+.fabContainer {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  margin-top: -25px; /* Sobe a bolinha verde */
+}
+
+.fabButton {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #22c55e;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.fabButton:active {
+  transform: scale(0.95);
 }
