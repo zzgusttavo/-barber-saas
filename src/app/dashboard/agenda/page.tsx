@@ -44,7 +44,7 @@ export default function AgendaPage() {
   const handleComplete = async (id: string) => {
     try {
       const res = await fetch(`/api/appointments/${id}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'completed' })
       });
@@ -98,54 +98,54 @@ export default function AgendaPage() {
             style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(0,0,0,0.1)', outline: 'none' }}
           >
             <option value="all">Todos os Profissionais</option>
-            {team.map(b => (
-              <option key={b.id} value={b.id}>{b.name}</option>
-            ))}
+            {team.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
           </select>
         </div>
       )}
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', overflowX: 'auto', paddingBottom: '1rem', scrollbarWidth: 'none' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.5rem', marginBottom: '1.5rem', scrollBehavior: 'smooth' }}>
         {nextDays.map((d, i) => (
-          <div 
-            key={i} 
-            style={{ 
-              minWidth: '60px', 
-              padding: '1rem 0.5rem', 
-              borderRadius: '12px', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              alignItems: 'center', 
-              cursor: 'pointer',
-              backgroundColor: d.fullDateStr === selectedFilterDate ? '#16a34a' : '#fff',
-              color: d.fullDateStr === selectedFilterDate ? '#fff' : '#18181b',
-              border: d.fullDateStr === selectedFilterDate ? 'none' : '1px solid rgba(0,0,0,0.1)'
-            }}
+          <button
+            key={i}
             onClick={() => setSelectedFilterDate(d.fullDateStr)}
+            style={{
+              flexShrink: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '60px',
+              height: '70px',
+              borderRadius: '12px',
+              border: selectedFilterDate === d.fullDateStr ? '2px solid #22c55e' : '1px solid rgba(0,0,0,0.05)',
+              backgroundColor: selectedFilterDate === d.fullDateStr ? 'rgba(34, 197, 94, 0.1)' : '#fff',
+              color: selectedFilterDate === d.fullDateStr ? '#16a34a' : '#71717a',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
           >
-            <span style={{ fontSize: '0.75rem', fontWeight: 600, opacity: 0.8 }}>{d.dayName}</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>{d.dayName}</span>
             <span style={{ fontSize: '1.25rem', fontWeight: 800 }}>{d.dayNumber}</span>
-          </div>
+          </button>
         ))}
       </div>
 
-      <div style={{ marginTop: '1rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {filteredAppointments.length === 0 ? (
-          <div style={{ backgroundColor: '#fff', padding: '2rem', borderRadius: '16px', textAlign: 'center', color: '#71717a' }}>
-            <CalendarClock size={32} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
-            <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#18181b' }}>Nenhum agendamento encontrado</h3>
-            <p style={{ fontSize: '0.875rem' }}>Não há agendamentos para esta data.</p>
+          <div style={{ textAlign: 'center', color: '#71717a', padding: '2rem' }}>
+            Nenhum agendamento para este dia.
           </div>
         ) : (
-          filteredAppointments.map((app) => {
+          filteredAppointments.map(app => {
             const srv = services.find(s => s.id === app.serviceId);
             const barber = team.find(b => b.id === app.barberId);
+            
             return (
-              <div key={app.id} style={{ backgroundColor: '#fff', borderRadius: '16px', padding: '1.25rem', marginBottom: '1rem', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, color: '#18181b' }}>
-                    <Clock size={16} color="#71717a" />
-                    {`${String(new Date(app.date).getUTCHours()).padStart(2, '0')}:${String(new Date(app.date).getUTCMinutes()).padStart(2, '0')}`}
+              <div key={app.id} style={{ backgroundColor: '#fff', padding: '1.5rem', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.02)', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#16a34a', fontWeight: 700 }}>
+                    <Clock size={16} />
+                    {new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' }).format(app.dateObj)}
                   </div>
                   <div style={{ padding: '0.25rem 0.5rem', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 700, backgroundColor: app.status === 'completed' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(245, 158, 11, 0.1)', color: app.status === 'completed' ? '#16a34a' : '#d97706' }}>
                     {app.status === 'completed' ? 'FINALIZADO' : 'AGUARDANDO'}
@@ -154,7 +154,7 @@ export default function AgendaPage() {
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                   <div>
-                    <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#18181b' }}>{app.customerName}</div>
+                    <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#18181b' }}>{app.client?.name || 'Cliente'}</div>
                     <div style={{ fontSize: '0.875rem', color: '#71717a' }}>{srv?.name || 'Serviço'} {barber && `• ${barber.name}`}</div>
                   </div>
                   <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#16a34a' }}>

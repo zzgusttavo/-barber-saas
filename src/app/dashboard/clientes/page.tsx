@@ -32,18 +32,21 @@ export default function ClientesPage() {
     const srv = services.find(s => s.id === app.serviceId);
     const price = srv ? Number(srv.price) : 0;
     
-    if (clientMap.has(app.customerPhone)) {
-      const existing = clientMap.get(app.customerPhone);
-      clientMap.set(app.customerPhone, {
+    const cPhone = app.client?.whatsapp || 'Sem Número';
+    const cName = app.client?.name || 'Cliente';
+
+    if (clientMap.has(cPhone)) {
+      const existing = clientMap.get(cPhone);
+      clientMap.set(cPhone, {
         ...existing,
         visits: existing.visits + 1,
         totalSpent: existing.totalSpent + price,
         lastVisit: app.date > existing.lastVisit ? app.date : existing.lastVisit
       });
     } else {
-      clientMap.set(app.customerPhone, {
-        name: app.customerName,
-        phone: app.customerPhone,
+      clientMap.set(cPhone, {
+        name: cName,
+        phone: cPhone,
         visits: 1,
         totalSpent: price,
         lastVisit: app.date
