@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import styles from './layout.module.css';
-import { Home, CalendarDays, Users, User, Plus, LogOut, FileText, Banknote, Scissors, Settings, Crown } from 'lucide-react';
+import { Home, CalendarDays, Users, User, Plus, LogOut, FileText, Banknote, Scissors, Settings, Crown, UserCog } from 'lucide-react';
 
 export default function DashboardLayout({
   children,
@@ -53,6 +53,10 @@ export default function DashboardLayout({
             <Users size={20} />
             <span>Clientes</span>
           </Link>
+          <Link href="/dashboard/profissionais" className={`${styles.sidebarItem} ${pathname.startsWith('/dashboard/profissionais') ? styles.sidebarItemActive : ''}`}>
+            <UserCog size={20} />
+            <span>Profissionais</span>
+          </Link>
           <Link href="/dashboard/servicos" className={`${styles.sidebarItem} ${pathname.startsWith('/dashboard/servicos') ? styles.sidebarItemActive : ''}`}>
             <Scissors size={20} />
             <span>Serviços</span>
@@ -60,11 +64,11 @@ export default function DashboardLayout({
           
           <div className={styles.sidebarDivider}></div>
 
-          <Link href="#" onClick={(e) => { e.preventDefault(); alert('Em breve!'); }} className={styles.sidebarItem}>
+          <Link href="/dashboard/meu-caixa" className={`${styles.sidebarItem} ${pathname.startsWith('/dashboard/meu-caixa') ? styles.sidebarItemActive : ''}`}>
             <Banknote size={20} />
             <span>Meu Caixa</span>
           </Link>
-          <Link href="#" onClick={(e) => { e.preventDefault(); alert('Em breve!'); }} className={styles.sidebarItem}>
+          <Link href="/dashboard/relatorios" className={`${styles.sidebarItem} ${pathname.startsWith('/dashboard/relatorios') ? styles.sidebarItemActive : ''}`}>
             <FileText size={20} />
             <span>Relatórios</span>
           </Link>

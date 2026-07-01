@@ -2,12 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSession } from "next-auth/react";
-import { Settings, CheckCircle2, Share2, Link as LinkIcon, Camera, Copy, LogOut } from 'lucide-react';
+import { useRouter } from "next/navigation";
+import { Settings, CheckCircle2, Share2, Link as LinkIcon, Camera, Copy, LogOut, Plus, UserCog, ChevronRight } from 'lucide-react';
 
 export default function ConfiguracoesPage() {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const [waStatus, setWaStatus] = useState('loading');
   const [waQR, setWaQR] = useState<string | null>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   
   const ownerName = session?.user?.name || "Proprietário";
   const slug = (session?.user as any)?.slug || "minha-barbearia";
@@ -36,19 +39,46 @@ export default function ConfiguracoesPage() {
     alert('Link copiado!');
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div style={{ paddingBottom: '2rem', maxWidth: '800px', margin: '0 auto' }}>
       <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#18181b', marginBottom: '1.5rem' }}>Perfil & Sistema</h1>
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem', backgroundColor: '#fff', padding: '2rem 1rem', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.02)', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
-        <div style={{ width: 80, height: 80, borderRadius: '50%', backgroundColor: '#e4e4e7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', position: 'relative' }}>
-          <Camera size={24} color="#71717a" />
+        <label style={{ width: 80, height: 80, borderRadius: '50%', backgroundColor: '#e4e4e7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', position: 'relative', cursor: 'pointer', overflow: 'hidden' }}>
+          {profileImage ? (
+             <img src={profileImage} alt="Perfil" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+             <Camera size={24} color="#71717a" />
+          )}
           <div style={{ position: 'absolute', bottom: 0, right: 0, backgroundColor: '#16a34a', padding: '0.25rem', borderRadius: '50%', border: '2px solid #fff' }}>
              <Plus size={12} color="#fff" strokeWidth={3} />
           </div>
-        </div>
+          <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageChange} />
+        </label>
         <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>{ownerName}</h2>
         <span style={{ color: '#71717a', fontSize: '0.875rem' }}>Proprietário</span>
+      </div>
+
+      <div style={{ backgroundColor: '#fff', borderRadius: '16px', padding: '1.5rem', marginBottom: '1rem', border: '1px solid rgba(0,0,0,0.02)', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
+        <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <UserCog size={18} /> Equipe & Profissionais
+        </h3>
+        <p style={{ color: '#71717a', fontSize: '0.875rem', marginBottom: '1rem' }}>Adicione ou gerencie os barbeiros que atendem no seu negócio.</p>
+        
+        <button onClick={() => router.push('/dashboard/profissionais')} style={{ width: '100%', backgroundColor: '#f4f4f5', color: '#18181b', padding: '1rem', borderRadius: '8px', border: 'none', fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+          Gerenciar Profissionais <ChevronRight size={16} color="#71717a" />
+        </button>
       </div>
 
       <div style={{ backgroundColor: '#fff', borderRadius: '16px', padding: '1.5rem', marginBottom: '1rem', border: '1px solid rgba(0,0,0,0.02)', boxShadow: '0 4px 15px rgba(0,0,0,0.02)' }}>
@@ -101,7 +131,3 @@ export default function ConfiguracoesPage() {
     </div>
   );
 }
-
-const Plus = ({ size, color, strokeWidth }: any) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-);

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './page.module.css';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -19,6 +19,21 @@ export default function ProfissionaisPage() {
   const [barbers, setBarbers] = useState(initialBarbers);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ name: '', phone: '', specialty: '' });
+
+  // Carrega do localStorage ao iniciar
+  useEffect(() => {
+    const saved = localStorage.getItem('@barbersaas:barbers');
+    if (saved) {
+      setBarbers(JSON.parse(saved));
+    }
+  }, []);
+
+  // Salva no localStorage quando altera
+  useEffect(() => {
+    if (barbers !== initialBarbers || barbers.length > 0) {
+      localStorage.setItem('@barbersaas:barbers', JSON.stringify(barbers));
+    }
+  }, [barbers]);
 
   const handleAddBarber = () => {
     // Em um cenário real, aqui seria uma chamada API com o Prisma
@@ -84,10 +99,14 @@ export default function ProfissionaisPage() {
                     </td>
                     <td>
                       <div className={styles.actions} style={{ justifyContent: 'flex-end' }}>
-                        <button className={styles.actionButton} aria-label="Editar">
+                        <button className={styles.actionButton} aria-label="Editar" onClick={() => alert('Edição em breve')}>
                           <Edit2 size={16} />
                         </button>
-                        <button className={styles.actionButton} aria-label="Remover">
+                        <button className={styles.actionButton} aria-label="Remover" onClick={() => {
+                          if (confirm(`Deseja realmente remover ${barber.name}?`)) {
+                            setBarbers(barbers.filter(b => b.id !== barber.id));
+                          }
+                        }}>
                           <Trash2 size={16} />
                         </button>
                       </div>

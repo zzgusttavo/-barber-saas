@@ -31,8 +31,8 @@ export default function AssinaturaPage() {
                 <>
                   <div className={styles.pricePromo}>
                     <span className={styles.currency}>R$</span>
-                    5,00
-                    <span className={styles.period}>/ 1º mês</span>
+                    0,00
+                    <span className={styles.period}>/ 7 dias</span>
                   </div>
                   <div className={styles.priceNormal}>Depois R$ 44,90/mês</div>
                 </>
@@ -51,7 +51,7 @@ export default function AssinaturaPage() {
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
             </div>
             <p className={styles.alertText}>
-              Comece hoje por apenas R$ 5,00 no primeiro mês. Após esse período, sua assinatura será renovada automaticamente por R$ 44,90/mês. Você pode cancelar a qualquer momento, sem fidelidade.
+              Comece hoje com <strong>7 dias totalmente grátis</strong>. Após o período de teste, sua assinatura será renovada via Mercado Pago por R$ 44,90/mês. Você pode cancelar a qualquer momento.
             </p>
           </div>
 
@@ -89,11 +89,11 @@ export default function AssinaturaPage() {
           </div>
 
           <div className={styles.actions}>
-            <Button variant="ghost" style={{ color: 'var(--danger-color)' }}>
+            <Button variant="ghost" style={{ color: 'var(--danger-color)' }} onClick={() => alert('Para cancelar, acesse a área de assinaturas do Mercado Pago.')}>
               Cancelar Assinatura
             </Button>
-            <Button variant="secondary">
-              Atualizar Cartão
+            <Button variant="accent" onClick={() => window.open('https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=2c9380848f956c86018f99e46a7d0139', '_blank')}>
+              Gerenciar no Mercado Pago
             </Button>
           </div>
         </CardContent>
