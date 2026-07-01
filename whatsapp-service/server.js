@@ -105,7 +105,12 @@ app.post('/pair', async (req, res) => {
         if (!phone) return res.status(400).json({ error: 'Número de telefone é obrigatório' });
         
         // Remove caracteres não numéricos
-        const cleanPhone = phone.replace(/[^0-9]/g, '');
+        let cleanPhone = phone.replace(/[^0-9]/g, '');
+        
+        // Se a pessoa digitou apenas DDD + Número (10 ou 11 dígitos), adiciona o 55 do Brasil
+        if (cleanPhone.length === 10 || cleanPhone.length === 11) {
+            cleanPhone = '55' + cleanPhone;
+        }
         
         console.log(`[WHATSAPP] Solicitando Pairing Code para o número: ${cleanPhone}`);
         const code = await sock.requestPairingCode(cleanPhone);
