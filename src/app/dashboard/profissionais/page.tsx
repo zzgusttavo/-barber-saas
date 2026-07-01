@@ -8,44 +8,54 @@ import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Plus, Edit2, Trash2, Scissors } from 'lucide-react';
 
-// Array vazio para não criar profissionais falsos no localStorage
-const initialBarbers: any[] = [];
 
 export default function ProfissionaisPage() {
-  const [barbers, setBarbers] = useState(initialBarbers);
+  const [barbers, setBarbers] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: '', phone: '', specialty: '' });
+  const [formData, setFormData] = useState({ name: '', phone: '', email: '', password: '', specialty: '' });
 
-  // Carrega do localStorage ao iniciar
+  // Carrega da API ao iniciar
   useEffect(() => {
-    const saved = localStorage.getItem('@barbersaas:barbers');
-    if (saved) {
-      setBarbers(JSON.parse(saved));
-    }
+    fetch('/api/barbers')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setBarbers(data);
+      })
+      .catch(console.error);
   }, []);
 
-  // Salva no localStorage quando altera
-  useEffect(() => {
-    if (barbers !== initialBarbers || barbers.length > 0) {
-      localStorage.setItem('@barbersaas:barbers', JSON.stringify(barbers));
+  const handleAddBarber = async () => {
+    if (!formData.name || !formData.email || !formData.password) {
+      return alert('Nome, email e senha são obrigatórios.');
     }
-  }, [barbers]);
+    try {
+      const res = await fetch('/api/barbers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setBarbers([...barbers, { ...data, status: 'Ativo', specialty: formData.specialty || 'Geral' }]);
+        setIsModalOpen(false);
+        setFormData({ name: '', phone: '', email: '', password: '', specialty: '' });
+      } else {
+        alert(data.error || 'Erro ao criar barbeiro');
+      }
+    } catch (e) {
+      alert('Erro de conexão ao criar barbeiro');
+    }
+  };
 
-  const handleAddBarber = () => {
-    // Em um cenário real, aqui seria uma chamada API com o Prisma
-    if (formData.name) {
-      setBarbers([
-        ...barbers,
-        {
-          id: Math.random().toString(),
-          name: formData.name,
-          phone: formData.phone,
-          status: 'Ativo',
-          specialty: formData.specialty || 'Geral'
-        }
-      ]);
-      setIsModalOpen(false);
-      setFormData({ name: '', phone: '', specialty: '' });
+  const handleDeleteBarber = async (id: string) => {
+    if (!confirm("Tem certeza que deseja desativar este profissional?")) return;
+    try {
+      const res = await fetch(`/api/barbers?id=${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setBarbers(barbers.filter(b => b.id !== id));
+      }
+    } catch(e) {
+      alert("Erro ao remover profissional.");
     }
   };
 
@@ -98,11 +108,7 @@ export default function ProfissionaisPage() {
                         <button className={styles.actionButton} aria-label="Editar" onClick={() => alert('Edição em breve')}>
                           <Edit2 size={16} />
                         </button>
-                        <button className={styles.actionButton} aria-label="Remover" onClick={() => {
-                          if (confirm(`Deseja realmente remover ${barber.name}?`)) {
-                            setBarbers(barbers.filter(b => b.id !== barber.id));
-                          }
-                        }}>
+                        <button className={styles.actionButton} onClick={() => handleDeleteBarber(barber.id)}>
                           <Trash2 size={16} />
                         </button>
                       </div>
@@ -142,8 +148,21 @@ export default function ProfissionaisPage() {
             onChange={(e) => setFormData({...formData, phone: e.target.value})}
           />
           <Input 
-            label="Especialidade Principal (Opcional)" 
-            placeholder="Ex: Especialista em Degradê" 
+            label="E-mail (Login)" 
+            placeholder="barbeiro@email.com" 
+            value={formData.email}
+            onChange={(e) => setFormData({...formData, email: e.target.value})}
+          />
+          <Input 
+            label="Senha" 
+            type="password"
+            placeholder="***" 
+            value={formData.password}
+            onChange={(e) => setFormData({...formData, password: e.target.value})}
+          />
+          <Input 
+            label="Especialidade" 
+            placeholder="Ex: Degrade, Barba" 
             value={formData.specialty}
             onChange={(e) => setFormData({...formData, specialty: e.target.value})}
           />
