@@ -11,10 +11,10 @@ export default function AdPreviewPage() {
       <div className="w-full max-w-[400px] shadow-[0_0_30px_rgba(243,156,18,0.3)] rounded-[20px] overflow-hidden border border-gray-800">
         <Player
           component={BarberAd}
-          durationInFrames={300} // 10 seconds at 30 fps
+          durationInFrames={1500} // 25 seconds at 60 fps
           compositionWidth={1080}
           compositionHeight={1920}
-          fps={30}
+          fps={60}
           controls
           style={{
             width: '100%',

@@ -280,17 +280,23 @@ export default function DashboardPage() {
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '1rem' }}>
-              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#16a34a' }}>{formatCurrency(totalEarningsToday * 5.5)}</div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.25rem', color: '#16a34a', fontSize: '0.75rem', fontWeight: 700 }}>
-                ▲ 18,2%
-                <span style={{ color: '#a1a1aa', fontWeight: 500, fontSize: '0.65rem' }}>vs semana anterior</span>
-              </div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#16a34a' }}>{formatCurrency(totalEarningsToday)}</div>
+              {totalEarningsToday > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.25rem', color: '#16a34a', fontSize: '0.75rem', fontWeight: 700 }}>
+                  ▲ 18,2%
+                  <span style={{ color: '#a1a1aa', fontWeight: 500, fontSize: '0.65rem' }}>vs semana anterior</span>
+                </div>
+              )}
             </div>
             
             {/* Chart placeholder */}
             <div style={{ height: '100px', width: '100%', marginTop: '1rem', background: 'linear-gradient(to top, rgba(34, 197, 94, 0.1), transparent)', position: 'relative', overflow: 'hidden', borderRadius: '8px' }}>
                <svg width="100%" height="100%" viewBox="0 0 100 40" preserveAspectRatio="none" style={{ position: 'absolute', bottom: 0, left: 0 }}>
-                 <path d="M0 35 Q 15 25, 30 30 T 50 15 T 70 20 T 85 5 T 100 10" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" />
+                 {totalEarningsToday > 0 ? (
+                   <path d="M0 35 Q 15 25, 30 30 T 50 15 T 70 20 T 85 5 T 100 10" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" />
+                 ) : (
+                   <path d="M0 35 L 100 35" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" />
+                 )}
                </svg>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', color: '#a1a1aa', fontSize: '0.65rem' }}>
