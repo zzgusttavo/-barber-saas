@@ -830,7 +830,7 @@ export default function AppDonoPage() {
               <span style={{ fontWeight: 700, fontSize: '1rem' }}>O que está incluído no seu plano</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {subscriptionData.features.map(feature => (
+              {subscriptionData.features.map((feature: string) => (
                 <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <div style={{ width: 22, height: 22, borderRadius: '50%', backgroundColor: 'rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <CheckCircle2 size={13} color="#22c55e" />
