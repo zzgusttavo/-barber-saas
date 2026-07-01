@@ -103,3 +103,19 @@
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
+
+.modalButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .modalButtons {
+    flex-direction: column-reverse;
+  }
+  .modalCancelBtn, .modalSaveBtn {
+    width: 100%;
+  }
+}

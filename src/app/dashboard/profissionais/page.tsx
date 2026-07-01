@@ -12,6 +12,7 @@ import { Plus, Edit2, Trash2, Scissors } from 'lucide-react';
 export default function ProfissionaisPage() {
   const [barbers, setBarbers] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingBarberId, setEditingBarberId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ name: '', phone: '', email: '', password: '', specialty: '' });
 
   // Carrega da API ao iniciar
@@ -24,27 +25,51 @@ export default function ProfissionaisPage() {
       .catch(console.error);
   }, []);
 
-  const handleAddBarber = async () => {
-    if (!formData.name || !formData.email || !formData.password) {
+  const handleSaveBarber = async () => {
+    if (!formData.name || !formData.email || (!editingBarberId && !formData.password)) {
       return alert('Nome, email e senha são obrigatórios.');
     }
     try {
+      const isEdit = !!editingBarberId;
       const res = await fetch('/api/barbers', {
-        method: 'POST',
+        method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(isEdit ? { id: editingBarberId, ...formData } : formData)
       });
       const data = await res.json();
       if (res.ok) {
-        setBarbers([...barbers, { ...data, status: 'Ativo', specialty: formData.specialty || 'Geral' }]);
+        if (isEdit) {
+          setBarbers(barbers.map(b => b.id === editingBarberId ? { ...b, ...data, specialty: formData.specialty || 'Geral' } : b));
+        } else {
+          setBarbers([...barbers, { ...data, status: 'Ativo', specialty: formData.specialty || 'Geral' }]);
+        }
         setIsModalOpen(false);
+        setEditingBarberId(null);
         setFormData({ name: '', phone: '', email: '', password: '', specialty: '' });
       } else {
-        alert(data.error || 'Erro ao criar barbeiro');
+        alert(data.error || 'Erro ao salvar barbeiro');
       }
     } catch (e) {
-      alert('Erro de conexão ao criar barbeiro');
+      alert('Erro de conexão ao salvar barbeiro');
     }
+  };
+
+  const handleEditClick = (barber: any) => {
+    setEditingBarberId(barber.id);
+    setFormData({
+      name: barber.name || '',
+      phone: barber.phone || '',
+      email: barber.email || '',
+      password: '', // Não preencher a senha existente
+      specialty: barber.specialty || ''
+    });
+    setIsModalOpen(true);
+  };
+
+  const openNewBarberModal = () => {
+    setEditingBarberId(null);
+    setFormData({ name: '', phone: '', email: '', password: '', specialty: '' });
+    setIsModalOpen(true);
   };
 
   const handleDeleteBarber = async (id: string) => {
@@ -66,7 +91,7 @@ export default function ProfissionaisPage() {
           <h1 className={`${styles.title} text-gradient`}>Profissionais</h1>
           <p style={{ color: 'var(--text-secondary)' }}>Gerencie os barbeiros da sua barbearia.</p>
         </div>
-        <Button variant="accent" onClick={() => setIsModalOpen(true)}>
+        <Button variant="accent" onClick={openNewBarberModal}>
           <Plus size={18} /> Novo Profissional
         </Button>
       </div>
@@ -105,7 +130,7 @@ export default function ProfissionaisPage() {
                     </td>
                     <td>
                       <div className={styles.actions} style={{ justifyContent: 'flex-end' }}>
-                        <button className={styles.actionButton} aria-label="Editar" onClick={() => alert('Edição em breve')}>
+                        <button className={styles.actionButton} aria-label="Editar" onClick={() => handleEditClick(barber)}>
                           <Edit2 size={16} />
                         </button>
                         <button className={styles.actionButton} onClick={() => handleDeleteBarber(barber.id)}>
@@ -131,7 +156,7 @@ export default function ProfissionaisPage() {
       <Modal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)}
-        title="Adicionar Profissional"
+        title={editingBarberId ? "Editar Profissional" : "Adicionar Profissional"}
       >
         <div className={styles.formGrid}>
           <Input 
@@ -154,7 +179,7 @@ export default function ProfissionaisPage() {
             onChange={(e) => setFormData({...formData, email: e.target.value})}
           />
           <Input 
-            label="Senha" 
+            label="Senha (Deixe em branco para não alterar)" 
             type="password"
             placeholder="***" 
             value={formData.password}
@@ -167,10 +192,10 @@ export default function ProfissionaisPage() {
             onChange={(e) => setFormData({...formData, specialty: e.target.value})}
           />
         </div>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
-          <Button variant="ghost" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
-          <Button variant="accent" onClick={handleAddBarber} disabled={!formData.name}>
-            Salvar Profissional
+        <div className={styles.modalButtons}>
+          <Button variant="ghost" onClick={() => setIsModalOpen(false)} className={styles.modalCancelBtn}>Cancelar</Button>
+          <Button variant="accent" onClick={handleSaveBarber} disabled={!formData.name} className={styles.modalSaveBtn}>
+            {editingBarberId ? "Salvar Alterações" : "Salvar Profissional"}
           </Button>
         </div>
       </Modal>

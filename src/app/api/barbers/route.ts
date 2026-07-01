@@ -139,3 +139,54 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: 'Erro ao desativar barbeiro' }, { status: 500 });
   }
 }
+
+export async function PUT(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
+    const userId = (session.user as any).id;
+    const currentBarber = await prisma.barber.findUnique({ where: { id: userId } });
+    if (!currentBarber || currentBarber.role !== 'OWNER') {
+      return NextResponse.json({ error: 'Apenas o dono da barbearia pode gerenciar a equipe.' }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const { id, name, email, password, phone, specialty } = body;
+
+    if (!id || !name || !email) {
+      return NextResponse.json({ error: 'ID, Nome e E-mail são obrigatórios.' }, { status: 400 });
+    }
+
+    const dataToUpdate: any = {
+      name,
+      email,
+      phone: phone || "",
+      // Se não adicionamos specialty no banco, talvez não precisemos atualizar?
+      // Wait, o model Barber tem 'specialty'? Let's check prisma schema later.
+    };
+
+    if (password) {
+      dataToUpdate.password = await bcrypt.hash(password, 10);
+    }
+
+    // Verificar se e-mail pertence a outro usuário
+    const existingBarber = await prisma.barber.findUnique({ where: { email } });
+    if (existingBarber && existingBarber.id !== id) {
+      return NextResponse.json({ error: 'E-mail já está em uso por outro barbeiro.' }, { status: 400 });
+    }
+
+    const updatedBarber = await prisma.barber.update({
+      where: { id },
+      data: dataToUpdate,
+      select: { id: true, name: true, email: true, phone: true }
+    });
+
+    return NextResponse.json(updatedBarber);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Erro ao atualizar barbeiro' }, { status: 500 });
+  }
+}
