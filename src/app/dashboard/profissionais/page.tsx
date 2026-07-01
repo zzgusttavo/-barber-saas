@@ -8,12 +8,8 @@ import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Plus, Edit2, Trash2, Scissors } from 'lucide-react';
 
-// Mock data para UI inicial
-const initialBarbers = [
-  { id: '1', name: 'Carlos Eduardo', phone: '(11) 98888-7777', status: 'Ativo', specialty: 'Corte e Barba' },
-  { id: '2', name: 'Marcos Silva', phone: '(11) 97777-6666', status: 'Ativo', specialty: 'Degradê e Pigmentação' },
-  { id: '3', name: 'Rafael Costa', phone: '(11) 96666-5555', status: 'Inativo', specialty: 'Corte Infantil' },
-];
+// Array vazio para não criar profissionais falsos no localStorage
+const initialBarbers: any[] = [];
 
 export default function ProfissionaisPage() {
   const [barbers, setBarbers] = useState(initialBarbers);
