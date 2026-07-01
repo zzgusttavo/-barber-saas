@@ -173,12 +173,13 @@ export async function POST(request: Request) {
     try {
       const msgText = `Olá ${clientName}! Seu agendamento na ${barbershop.name} foi confirmado.\n\n✂️ Serviço: ${service.name}\n📅 Data: ${date} às ${time}\n💰 Valor: R$ ${service.price.toFixed(2)}`;
       
-      console.log(`[WHATSAPP] Disparando mensagem para ${whatsapp}: ${msgText}`);
+      const targetWhatsapp = client.whatsapp || whatsapp;
+      console.log(`[WHATSAPP] Disparando mensagem para ${targetWhatsapp}: ${msgText}`);
 
-      fetch('https://loud-eggs-serve.loca.lt/send', {
+      fetch('https://barber-bot-gustavo-999.loca.lt/send', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ number: whatsapp, message: msgText })
+        headers: { 'Content-Type': 'application/json', 'Bypass-Tunnel-Reminder': 'true' },
+        body: JSON.stringify({ number: targetWhatsapp, message: msgText })
       }).catch(e => console.error("Falha ao notificar microserviço:", e));
 
     } catch (waError) {
